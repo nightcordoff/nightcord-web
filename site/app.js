@@ -1,0 +1,225 @@
+const state = {
+    overview: null,
+};
+
+const contributeState = {
+    activeTimeout: null,
+};
+
+async function readJson(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+    return response.json();
+}
+
+function setHeaderStatus(message, ok = true) {
+    const element = document.getElementById('header-status');
+    if (!element) return;
+    element.textContent = message;
+    element.style.color = ok ? '#d6d6dc' : '#b4b4bb';
+    element.style.background = ok ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.06)';
+}
+
+function renderOverview(overview) {
+    state.overview = overview;
+    const metricGrid = document.getElementById('metric-grid');
+    const stackList = document.getElementById('stack-list');
+    const liveDatabase = document.getElementById('live-database');
+    const stableDownloads = document.getElementById('stable-downloads');
+    const pluginCount = document.getElementById('plugin-count');
+    const featuredEnabled = new Set(['AntiDeco', 'VoiceDictation']);
+    const homepageFeatures = Array.isArray(overview.features)
+        ? overview.features.filter((feature) => feature.name !== 'StereoMic')
+        : [];
+    document.getElementById('hero-eyebrow').textContent = overview.hero.eyebrow;
+    document.getElementById('hero-eyebrow-clone').textContent = overview.hero.eyebrow;
+    document.getElementById('hero-title').textContent = overview.brand;
+    document.getElementById('hero-subtitle').textContent = overview.hero.subtitle;
+    document.getElementById('live-version').textContent = `Download ${overview.version}`;
+    if (liveDatabase) {
+        liveDatabase.textContent = '';
+    }
+    if (stableDownloads) {
+        stableDownloads.textContent = new Intl.NumberFormat('en-US').format(overview.downloads.stable);
+    }
+    if (pluginCount) {
+        pluginCount.textContent = new Intl.NumberFormat('en-US').format(overview.plugin_count ?? 65);
+    }
+    document.getElementById('footer-runtime').textContent = `${overview.brand} runtime · ${overview.runtime}`;
+
+    if (metricGrid) {
+        metricGrid.innerHTML = overview.metrics.map((metric) => `
+            <article class="metric-card glass-lite">
+                <strong>${metric.value}</strong>
+                <span>${metric.label}</span>
+            </article>
+        `).join('');
+    }
+
+    document.getElementById('feature-grid').innerHTML = homepageFeatures.map((feature, index) => {
+        const enabled = featuredEnabled.has(feature.name);
+        return `
+            <article class="feature-card feature-plugin-card glass-lite" data-enabled="${enabled}">
+                <div class="feature-plugin-head">
+                    <div>
+                        <span class="feature-chip">${feature.category}</span>
+                        <h3>${feature.name}</h3>
+                    </div>
+                    <button class="plugin-switch${enabled ? ' is-on' : ''}" type="button" aria-label="Toggle ${feature.name}" aria-pressed="${enabled}">
+                        <span></span>
+                    </button>
+                </div>
+                <p>${feature.description}</p>
+            </article>
+        `;
+    }).join('');
+
+    if (stackList) {
+        stackList.innerHTML = overview.stack.map((item) => `
+            <article class="stack-item glass-lite">
+                <span class="stack-chip">${item.type}</span>
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+            </article>
+        `).join('');
+    }
+
+    document.getElementById('release-list').innerHTML = overview.releases.map((release) => `
+        <article class="timeline-item glass-lite">
+            <div>
+                <div class="timeline-date">${release.released_at}</div>
+                <div class="feature-chip">${release.version}</div>
+            </div>
+            <div>
+                <h3>${release.title}</h3>
+                <p>${release.summary}</p>
+            </div>
+        </article>
+    `).join('');
+}
+
+async function copyText(value) {
+    if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        return;
+    }
+
+    const input = document.createElement('textarea');
+    input.value = value;
+    input.setAttribute('readonly', '');
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    document.body.append(input);
+    input.select();
+    document.execCommand('copy');
+    input.remove();
+}
+
+function updateContributeStatus(message) {
+    const status = document.getElementById('contribute-modal-status');
+    if (status) {
+        status.textContent = message;
+    }
+}
+
+function openContributeModal() {
+    const modal = document.getElementById('contribute-modal');
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+    updateContributeStatus('Choose a contact or wallet to copy');
+}
+
+function closeContributeModal() {
+    const modal = document.getElementById('contribute-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+}
+
+function bootContributeModal() {
+    const modal = document.getElementById('contribute-modal');
+    const openButton = document.getElementById('open-contribute-modal');
+    if (!modal || !openButton) {
+        return;
+    }
+
+    openButton.addEventListener('click', openContributeModal);
+
+    modal.addEventListener('click', async (event) => {
+        const closeTrigger = event.target.closest('[data-close-modal]');
+        if (closeTrigger) {
+            closeContributeModal();
+            return;
+        }
+
+        const copyButton = event.target.closest('.contribute-copy-button');
+        if (!copyButton) {
+            return;
+        }
+
+        const value = copyButton.dataset.copyValue;
+        const label = copyButton.dataset.copyLabel || 'Value';
+        const card = copyButton.closest('[data-copy-card]');
+        if (!value || !card) {
+            return;
+        }
+
+        try {
+            await copyText(value);
+            copyButton.textContent = 'Copied';
+            card.classList.add('is-copied');
+            updateContributeStatus(`${label} copied`);
+
+            if (contributeState.activeTimeout) {
+                window.clearTimeout(contributeState.activeTimeout);
+            }
+
+            contributeState.activeTimeout = window.setTimeout(() => {
+                modal.querySelectorAll('.contribute-copy-button').forEach((button) => {
+                    button.textContent = 'Copy';
+                });
+                modal.querySelectorAll('[data-copy-card]').forEach((item) => {
+                    item.classList.remove('is-copied');
+                });
+                updateContributeStatus('Ready to copy');
+            }, 1800);
+        } catch (error) {
+            console.error(error);
+            updateContributeStatus(`Failed to copy ${label.toLowerCase()}`);
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closeContributeModal();
+        }
+    });
+}
+
+document.getElementById('feature-grid')?.addEventListener('click', (event) => {
+    const button = event.target.closest('.plugin-switch');
+    if (!button) return;
+    const isOn = button.getAttribute('aria-pressed') === 'true';
+    button.setAttribute('aria-pressed', String(!isOn));
+    button.classList.toggle('is-on', !isOn);
+    button.closest('[data-enabled]')?.setAttribute('data-enabled', String(!isOn));
+});
+
+bootContributeModal();
+
+async function boot() {
+    try {
+        const health = await readJson('/api/health');
+        setHeaderStatus(`API ${health.status}`);
+        const overview = await readJson('/api/overview');
+        renderOverview(overview);
+    } catch (error) {
+        console.error(error);
+        setHeaderStatus('API unavailable', false);
+    }
+}
+
+boot();

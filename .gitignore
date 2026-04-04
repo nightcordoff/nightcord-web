@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+front-end/node_modules/
+back-end/node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+front-end/dist/
+back-end/dist/
+
+# Runtime data
+back-end/__pycache__/
+back-end/data/*.db
+back-end/data/*.sqlite
+back-end/data/*.sqlite3
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

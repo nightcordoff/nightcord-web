@@ -1,0 +1,10 @@
+{
+  "name": "nightcord",
+  "private": true,
+  "scripts": {
+    "dev": "sh -c 'npm run dev --prefix back-end & npm run dev --prefix front-end'",
+    "dev:front": "npm run dev --prefix front-end",
+    "dev:back": "npm run dev --prefix back-end",
+    "build": "npm run build --prefix front-end && npm run build --prefix back-end"
+  }
+}

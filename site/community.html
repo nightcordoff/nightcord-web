@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nightcord Community</title>
+    <meta name="description" content="Community contact page for Nightcord.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body data-page="community">
+    <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+    <div class="backdrop-grid" aria-hidden="true"></div>
+    <div class="aurora aurora-a" aria-hidden="true"></div>
+    <div class="aurora aurora-b" aria-hidden="true"></div>
+    <div class="aurora aurora-c" aria-hidden="true"></div>
+    <div class="home-sky" aria-hidden="true">
+        <div class="starfield">
+            <span class="star star-1"></span>
+            <span class="star star-2"></span>
+            <span class="star star-3"></span>
+            <span class="star star-4"></span>
+            <span class="star star-5"></span>
+            <span class="star star-6"></span>
+            <span class="star star-7"></span>
+            <span class="star star-8"></span>
+            <span class="star star-9"></span>
+            <span class="star star-10"></span>
+            <span class="star star-11"></span>
+            <span class="star star-12"></span>
+        </div>
+    </div>
+
+    <div class="site-shell">
+        <header class="site-header glass">
+            <a class="brand" href="/">
+                <span class="brand-mark"></span>
+                <span>Nightcord</span>
+            </a>
+            <nav class="main-nav">
+                <a href="/" data-nav="home">Home</a>
+                <a href="/plugins" data-nav="plugins">Plugins</a>
+                <a href="/preview" data-nav="preview">Preview</a>
+                <a href="/community" data-nav="community">Community</a>
+                <a href="/project.html" data-nav="project">Project</a>
+            </nav>
+            <div class="header-status" id="header-status">Community</div>
+        </header>
+
+        <main class="page" data-reveal>
+            <section class="page-hero glass">
+                <p class="eyebrow">Get in touch</p>
+                <h1>Reach the team, ask questions, and stay close to Nightcord.</h1>
+                <p class="hero-text">Community is now focused on contact and discussion only. Contribution details moved into the homepage popup for a faster flow.</p>
+            </section>
+
+            <section class="team-shell">
+                <div class="section-copy compact team-head">
+                    <p class="eyebrow">Team</p>
+                    <h3 id="team-title">Meet the Team</h3>
+                    <p class="hero-text" id="team-subtitle">Loading public Discord profiles…</p>
+                </div>
+
+                <div class="team-group">
+                    <h4 class="team-group-title">Owner</h4>
+                    <div class="team-grid team-grid-owner" id="team-owner-grid"></div>
+                </div>
+
+                <div class="team-group">
+                    <h4 class="team-group-title">Team</h4>
+                    <div class="team-grid" id="team-core-grid"></div>
+                </div>
+            </section>
+
+            <section class="discord-live-shell">
+                <div class="section-copy compact discord-live-head">
+                    <p class="eyebrow">Discord Live</p>
+                    <h3>Live hierarchy pulled from the Discord server when available.</h3>
+                    <p class="hero-text">This block uses the public Nightcord Discord invite and upgrades itself with widget data whenever Discord exposes the live channel tree.</p>
+                </div>
+                <div class="discord-live-grid">
+                    <article class="discord-live-card glass-dark discord-live-summary">
+                        <div class="discord-live-server">
+                            <div class="discord-live-icon" id="discord-live-icon">N</div>
+                            <div>
+                                <span class="feature-chip">Server</span>
+                                <h3 id="discord-server-name">Nightcord</h3>
+                                <p id="discord-server-description">Loading Discord server info…</p>
+                            </div>
+                        </div>
+                        <div class="discord-live-metrics">
+                            <div class="discord-live-metric">
+                                <span>Members</span>
+                                <strong id="discord-member-count">--</strong>
+                            </div>
+                            <div class="discord-live-metric">
+                                <span>Online</span>
+                                <strong id="discord-online-count">--</strong>
+                            </div>
+                        </div>
+                        <div class="button-row">
+                            <a class="button button-secondary" id="discord-invite-link" href="https://discord.gg/nightcordfr" target="_blank" rel="noreferrer">Open Discord server</a>
+                        </div>
+                        <div class="inline-status" id="discord-live-status">Syncing public Discord data…</div>
+                    </article>
+
+                    <article class="discord-live-card glass-dark">
+                        <div class="section-copy compact">
+                            <p class="eyebrow">Hierarchy</p>
+                            <h3>Live channels</h3>
+                        </div>
+                        <div class="discord-hierarchy-list" id="discord-hierarchy-list"></div>
+                    </article>
+
+                    <article class="discord-live-card glass-dark">
+                        <div class="section-copy compact">
+                            <p class="eyebrow">Online now</p>
+                            <h3>Visible Discord members</h3>
+                        </div>
+                        <div class="discord-member-list" id="discord-member-list"></div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="community-grid">
+                <article class="community-card glass">
+                    <span class="feature-chip">Instagram</span>
+                    <h3>@ryze_mp</h3>
+                    <p>Use Instagram for direct contact and follow-up around the project.</p>
+                </article>
+                <article class="community-card glass">
+                    <span class="feature-chip">Telegram</span>
+                    <h3>@ryze_mp</h3>
+                    <p>Reach out quickly for support, questions, or installation help.</p>
+                </article>
+                <article class="community-card glass">
+                    <span class="feature-chip">Discord</span>
+                    <h3>ahki__</h3>
+                    <p>Direct Discord contact for project questions and Nightcord help.</p>
+                </article>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <span id="footer-runtime">Nightcord Community</span>
+            <span>Use this page for contact, support, and discussion around Nightcord.</span>
+        </footer>
+    </div>
+
+    <script type="module" src="/shared.js"></script>
+    <script type="module" src="/community.js"></script>
+</body>
+
+</html>

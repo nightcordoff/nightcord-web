@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nightcord Download</title>
+    <meta name="description" content="Download the main Nightcord build.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body data-page="download">
+    <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+    <div class="backdrop-grid" aria-hidden="true"></div>
+    <div class="aurora aurora-a" aria-hidden="true"></div>
+    <div class="aurora aurora-b" aria-hidden="true"></div>
+    <div class="aurora aurora-c" aria-hidden="true"></div>
+
+    <div class="site-shell">
+        <header class="site-header glass">
+            <a class="brand" href="/">
+                <span class="brand-mark"></span>
+                <span>Nightcord</span>
+            </a>
+            <nav class="main-nav">
+                <a href="/" data-nav="home">Home</a>
+                <a href="/plugins" data-nav="plugins">Plugins</a>
+                <a href="/preview" data-nav="preview">Preview</a>
+                <a href="/community" data-nav="community">Community</a>
+                <a href="/project.html" data-nav="project">Project</a>
+            </nav>
+            <div class="header-status" id="header-status">Booting API</div>
+        </header>
+
+        <main class="page" data-reveal>
+            <section class="page-hero glass">
+                <p class="eyebrow">Download</p>
+                <h1>Download the main Nightcord build.</h1>
+                <p class="hero-text">Grab the installer and launch it.</p>
+            </section>
+
+            <section class="download-grid" id="download-grid"></section>
+        </main>
+
+        <footer class="site-footer">
+            <span id="footer-runtime">Nightcord runtime</span>
+            <span>Main installer only.</span>
+        </footer>
+    </div>
+
+    <script type="module" src="/shared.js"></script>
+    <script type="module" src="/download.js"></script>
+</body>
+
+</html>

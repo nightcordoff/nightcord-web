@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nightcord Admin</title>
+    <meta name="description" content="Nightcord admin console with hashed-password auth and delegated admin management.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body data-page="admin">
+    <canvas class="fx-canvas" id="fx-canvas" aria-hidden="true"></canvas>
+    <div class="backdrop-grid" aria-hidden="true"></div>
+    <div class="aurora aurora-a" aria-hidden="true"></div>
+    <div class="aurora aurora-b" aria-hidden="true"></div>
+    <div class="aurora aurora-c" aria-hidden="true"></div>
+
+    <div class="site-shell">
+        <header class="site-header glass">
+            <a class="brand" href="/">
+                <span class="brand-mark"></span>
+                <span>Nightcord</span>
+            </a>
+            <nav class="main-nav">
+                <a href="/" data-nav="home">Home</a>
+                <a href="/plugins" data-nav="plugins">Plugins</a>
+                <a href="/preview" data-nav="preview">Preview</a>
+                <a href="/community" data-nav="community">Community</a>
+                <a href="/project.html" data-nav="project">Project</a>
+            </nav>
+            <div class="header-status" id="header-status">Admin console</div>
+        </header>
+
+        <main class="page" data-reveal>
+            <section class="page-hero glass">
+                <p class="eyebrow">Admin</p>
+                <h1>Hashed-password access, superadmin bootstrap, and delegated admin control.</h1>
+                <p class="hero-text">This page talks to the live backend for login, password changes, and admin account management.</p>
+            </section>
+
+            <section class="admin-layout">
+                <div class="glass auth-panel">
+                    <div class="section-copy compact">
+                        <p class="eyebrow">Authentication</p>
+                        <h3>Session access</h3>
+                    </div>
+                    <div class="seeded-creds" id="seeded-creds"></div>
+                    <form class="auth-form" id="login-form">
+                        <label>
+                            <span>Email</span>
+                            <input type="email" id="login-email" autocomplete="username" required>
+                        </label>
+                        <label>
+                            <span>Password</span>
+                            <input type="password" id="login-password" autocomplete="current-password" required>
+                        </label>
+                        <div class="button-row">
+                            <button class="button button-primary" type="submit">Login</button>
+                            <button class="button button-secondary" type="button" id="logout-button">Logout</button>
+                        </div>
+                    </form>
+                    <form class="auth-form" id="password-form">
+                        <label>
+                            <span>Current password</span>
+                            <input type="password" id="current-password" autocomplete="current-password">
+                        </label>
+                        <label>
+                            <span>New password</span>
+                            <input type="password" id="new-password" autocomplete="new-password">
+                        </label>
+                        <button class="button button-secondary" type="submit">Change password</button>
+                    </form>
+                    <div class="inline-status" id="auth-status">Not authenticated.</div>
+                </div>
+
+                <div class="glass admin-panel">
+                    <div class="section-copy compact">
+                        <p class="eyebrow">Admin management</p>
+                        <h3>Create and update admins</h3>
+                    </div>
+                    <form class="auth-form" id="create-user-form">
+                        <div class="field-grid">
+                            <label>
+                                <span>Email</span>
+                                <input type="email" id="create-email" required>
+                            </label>
+                            <label>
+                                <span>Display name</span>
+                                <input type="text" id="create-display-name" required>
+                            </label>
+                            <label>
+                                <span>Admin title</span>
+                                <input type="text" id="create-admin-title" placeholder="Founder, Ops, Moderation">
+                            </label>
+                            <label>
+                                <span>Password</span>
+                                <input type="password" id="create-password" required>
+                            </label>
+                            <label>
+                                <span>Role</span>
+                                <select id="create-role">
+                                    <option value="admin">admin</option>
+                                    <option value="superadmin">superadmin</option>
+                                    <option value="viewer">viewer</option>
+                                </select>
+                            </label>
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="create-manage-admins">
+                                <span>Can manage admins</span>
+                            </label>
+                        </div>
+                        <button class="button button-primary" type="submit">Create account</button>
+                    </form>
+                    <div class="inline-status" id="admin-status">Use the seeded superadmin to unlock admin management.</div>
+                    <div class="user-list" id="user-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <span id="footer-runtime">Nightcord admin</span>
+            <span>Superadmin bootstrap and delegated access live in SQLite.</span>
+        </footer>
+    </div>
+
+    <script type="module" src="/shared.js"></script>
+    <script type="module" src="/admin.js"></script>
+</body>
+
+</html>
