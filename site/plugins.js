@@ -1,8 +1,18 @@
 import { plugins } from './plugin-catalog.js';
 
+const VIDEO_BASE = 'https://raw.githubusercontent.com/nightcordoff/nightcord-tutorials/main/videos/';
+
 const grid = document.getElementById('plugin-grid');
 const searchInput = document.getElementById('plugin-search-input');
 const resultsCount = document.getElementById('plugin-results-count');
+
+const modal = document.getElementById('plugin-detail-modal');
+const modalTitle = document.getElementById('plugin-detail-title');
+const modalCategory = document.getElementById('plugin-detail-category');
+const modalDescription = document.getElementById('plugin-detail-description');
+const modalVideo = document.getElementById('plugin-detail-video');
+const modalNoVideo = document.getElementById('plugin-detail-no-video');
+const modalVideoWrap = document.getElementById('plugin-detail-video-wrap');
 
 function getPluginIcon() {
     return `
@@ -37,14 +47,13 @@ function renderPlugins(list) {
         `;
     } else {
         grid.innerHTML = list.map((plugin, index) => `
-            <article class="plugin-card glass" style="animation-delay:${index * 40}ms" data-stagger>
+            <article class="plugin-card glass plugin-card-clickable" style="animation-delay:${index * 40}ms" data-stagger data-plugin-name="${plugin.name}">
                 <div class="plugin-card-top">
                     ${getPluginIcon()}
                     <span class="feature-chip">${plugin.category}</span>
                 </div>
                 <h3>${plugin.name}</h3>
                 <p>${plugin.description}</p>
-                <div class="plugin-meta">Plugin ${String(index + 1).padStart(2, '0')}</div>
             </article>
         `).join('');
     }
@@ -73,3 +82,65 @@ searchInput?.addEventListener('input', (event) => {
 });
 
 renderPlugins(plugins);
+
+function openPluginModal(pluginName) {
+    const plugin = plugins.find((p) => p.name === pluginName);
+    if (!plugin || !modal) return;
+
+    modalTitle.textContent = plugin.name;
+    modalCategory.textContent = plugin.category;
+    modalDescription.textContent = plugin.description;
+
+    const videoUrl = `${VIDEO_BASE}${encodeURIComponent(plugin.name)}.mp4`;
+    modalVideo.src = videoUrl;
+    modalVideo.hidden = false;
+    modalNoVideo.hidden = true;
+
+    modalVideo.onerror = () => {
+        modalVideo.hidden = true;
+        modalNoVideo.hidden = false;
+    };
+
+    modalVideo.onloadeddata = () => {
+        modalVideo.play().catch(() => {});
+    };
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+function closePluginModal() {
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    modalVideo.pause();
+    modalVideo.removeAttribute('src');
+    modalVideo.load();
+}
+
+grid?.addEventListener('click', (event) => {
+    const card = event.target.closest('[data-plugin-name]');
+    if (card) {
+        openPluginModal(card.dataset.pluginName);
+    }
+});
+
+modal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-plugin-modal]')) {
+        closePluginModal();
+    }
+});
+
+modalVideo?.addEventListener('click', () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        modalVideo.requestFullscreen().catch(() => {});
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal && !modal.hidden) {
+        closePluginModal();
+    }
+});

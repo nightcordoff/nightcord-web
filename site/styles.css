@@ -91,14 +91,14 @@ select {
 }
 
 @media (pointer: fine) {
-    body.has-custom-cursor,
-    body.has-custom-cursor a,
-    body.has-custom-cursor button,
-    body.has-custom-cursor input,
-    body.has-custom-cursor select,
-    body.has-custom-cursor textarea,
-    body.has-custom-cursor label {
-        cursor: none;
+    body,
+    body * {
+        cursor: none !important;
+    }
+
+    :fullscreen,
+    :fullscreen * {
+        cursor: default !important;
     }
 
     .cursor-ring,
@@ -1284,36 +1284,37 @@ body[data-page="home"] .moon-disc {
 
 .team-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 14px;
     justify-content: center;
+    max-width: 960px;
+    margin: 0 auto;
 }
 
 .team-grid-owner {
-    grid-template-columns: minmax(280px, 360px);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 280px));
     justify-content: center;
 }
 
 .team-card {
     position: relative;
     overflow: hidden;
-    width: min(100%, 360px);
-    min-height: 220px;
+    width: 100%;
     margin: 0 auto;
-    padding: 22px 20px 20px;
-    border-radius: 20px;
-    background:
-        linear-gradient(180deg, rgba(20, 20, 22, 0.92), rgba(12, 12, 14, 0.96));
-    background-size: cover;
-    background-position: center;
+    padding: 24px 16px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(18, 18, 20, 0.85);
+    transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.team-card:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    transform: translateY(-2px);
 }
 
 .team-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(11, 11, 13, 0.2), rgba(11, 11, 13, 0.92));
-    pointer-events: none;
+    display: none;
 }
 
 .team-card > * {
@@ -1323,16 +1324,16 @@ body[data-page="home"] .moon-disc {
 
 .team-avatar-wrap {
     position: relative;
-    width: 74px;
-    margin: 0 auto 14px;
+    width: 64px;
+    margin: 0 auto 10px;
 }
 
 .team-avatar {
-    width: 74px;
-    height: 74px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.14);
+    border: 2px solid rgba(255, 255, 255, 0.10);
     background: rgba(255, 255, 255, 0.06);
 }
 
@@ -1356,17 +1357,18 @@ body[data-page="home"] .moon-disc {
 
 .team-avatar-wrap .discord-status-dot {
     position: absolute;
-    right: 2px;
-    bottom: 2px;
-    width: 13px;
-    height: 13px;
-    border: 2px solid rgba(11, 11, 13, 0.95);
+    right: 0px;
+    bottom: 0px;
+    width: 14px;
+    height: 14px;
+    border: 3px solid rgba(18, 18, 20, 0.95);
 }
 
 .team-card h4 {
     margin: 0;
     text-align: center;
-    font-size: 1.55rem;
+    font-size: 1.1rem;
+    font-weight: 700;
 }
 
 .team-handle,
@@ -1376,21 +1378,20 @@ body[data-page="home"] .moon-disc {
 }
 
 .team-handle {
-    margin-top: 8px;
-    color: rgba(255, 255, 255, 0.78);
+    display: none;
 }
 
 .team-role {
-    margin-top: 10px;
-    color: #9ec7ff;
-    font-weight: 700;
+    display: none;
 }
 
 .team-card p {
-    margin: 10px auto 0;
-    max-width: 320px;
-    color: var(--muted);
-    line-height: 1.6;
+    margin: 4px auto 0;
+    max-width: 280px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.82rem;
+    font-style: italic;
+    line-height: 1.4;
 }
 
 .discord-live-head {
@@ -1476,7 +1477,11 @@ body[data-page="home"] .moon-disc {
 .discord-hierarchy-list,
 .discord-member-list {
     display: grid;
-    gap: 10px;
+    gap: 6px;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 .discord-hierarchy-item,
@@ -1484,15 +1489,37 @@ body[data-page="home"] .moon-disc {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 14px 16px;
-    border-radius: 18px;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .discord-hierarchy-item {
     justify-content: flex-start;
+}
+
+.discord-hierarchy-category {
+    margin-top: 10px;
+    padding: 4px 2px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.discord-hierarchy-category:first-child {
+    margin-top: 0;
+}
+
+.discord-hierarchy-icon {
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
 }
 
 .discord-hierarchy-bullet {
@@ -1505,6 +1532,7 @@ body[data-page="home"] .moon-disc {
 
 .discord-hierarchy-name {
     color: rgba(255, 255, 255, 0.86);
+    font-size: 0.9rem;
 }
 
 .discord-member-meta {
@@ -1540,26 +1568,31 @@ body[data-page="home"] .moon-disc {
 }
 
 .discord-status-dot {
+    display: block;
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: #6b7280;
 }
 
 .discord-status-online {
-    background: #57f287;
+    background: #57f287 !important;
 }
 
 .discord-status-idle {
-    background: #faa61a;
+    background: #faa61a !important;
 }
 
 .discord-status-dnd {
-    background: #ed4245;
+    background: #ed4245 !important;
+}
+
+.discord-status-streaming {
+    background: #9b59b6 !important;
 }
 
 .discord-status-offline {
-    background: #6b7280;
+    background: #6b7280 !important;
 }
 
 .discord-empty-state {
@@ -2173,6 +2206,90 @@ body[data-page="home"] .moon-disc {
 .plugin-card-empty {
     grid-column: 1 / -1;
     max-width: 420px;
+}
+
+.plugin-card-clickable {
+    cursor: pointer;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.plugin-card-clickable:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+}
+
+.plugin-detail-modal {
+    position: relative;
+    z-index: 1;
+    width: min(720px, calc(100vw - 32px));
+    max-height: min(90vh, 860px);
+    overflow: auto;
+    padding: 28px;
+    border-radius: 30px;
+    background: linear-gradient(180deg, rgba(14, 14, 16, 0.98), rgba(8, 8, 10, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 38px 120px rgba(0, 0, 0, 0.46);
+}
+
+.modal-shell:not([hidden]) .plugin-detail-modal {
+    animation: modalPopIn 280ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+.plugin-detail-modal-glow {
+    position: absolute;
+    inset: 0 auto auto 50%;
+    width: min(440px, 80vw);
+    height: 180px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.10), transparent 68%);
+    filter: blur(26px);
+    pointer-events: none;
+}
+
+.plugin-detail-content {
+    position: relative;
+    z-index: 1;
+}
+
+.plugin-detail-head {
+    margin-bottom: 22px;
+}
+
+.plugin-detail-head h2 {
+    margin: 12px 0 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    line-height: 1.05;
+}
+
+.plugin-detail-head .hero-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.plugin-detail-video-wrap {
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.plugin-detail-video-wrap video {
+    display: block;
+    width: 100%;
+    border-radius: 18px;
+    cursor: pointer;
+}
+
+.plugin-detail-no-video {
+    padding: 40px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.9rem;
 }
 
 .download-grid {

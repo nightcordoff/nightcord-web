@@ -80,7 +80,9 @@ function bootCanvas() {
 
     const context = canvas.getContext('2d');
     const particles = [];
-    const particleCount = 42;
+    const particleCount = 120;
+    const stars = [];
+    const starCount = 200;
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
     function resize() {
@@ -101,15 +103,41 @@ function bootCanvas() {
         };
     }
 
+    function makeStar() {
+        return {
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            radius: 0.4 + Math.random() * 1.2,
+            baseAlpha: 0.15 + Math.random() * 0.45,
+            twinkleSpeed: 0.005 + Math.random() * 0.02,
+            twinkleOffset: Math.random() * Math.PI * 2,
+        };
+    }
+
     function resetParticles() {
         particles.length = 0;
         for (let index = 0; index < particleCount; index += 1) {
             particles.push(makeParticle());
         }
+        stars.length = 0;
+        for (let index = 0; index < starCount; index += 1) {
+            stars.push(makeStar());
+        }
     }
 
+    let tick = 0;
+
     function animate() {
+        tick += 1;
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        for (const star of stars) {
+            const alpha = star.baseAlpha + Math.sin(tick * star.twinkleSpeed + star.twinkleOffset) * 0.2;
+            context.beginPath();
+            context.fillStyle = `rgba(255, 255, 255, ${Math.max(0.05, alpha)})`;
+            context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            context.fill();
+        }
 
         for (const particle of particles) {
             particle.x += particle.vx + (pointer.x - window.innerWidth / 2) * 0.00002;

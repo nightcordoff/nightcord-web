@@ -47,16 +47,32 @@
                     <span class="console-label">Search plugins</span>
                     <input id="plugin-search-input" type="search" placeholder="Search by plugin, category, or feature" autocomplete="off">
                 </label>
-                <div class="plugin-toolbar-meta">
-                    <span class="console-label">Results</span>
-                    <strong id="plugin-results-count">0 plugins</strong>
-                </div>
+
             </section>
 
             <section class="plugin-grid" id="plugin-grid"></section>
         </main>
 
         <footer class="site-footer">
+
+    <div class="modal-shell" id="plugin-detail-modal" hidden>
+        <div class="modal-backdrop" data-close-plugin-modal></div>
+        <section class="plugin-detail-modal glass" role="dialog" aria-modal="true" aria-labelledby="plugin-detail-title">
+            <button class="modal-close" type="button" data-close-plugin-modal aria-label="Close plugin detail">Close</button>
+            <div class="plugin-detail-modal-glow" aria-hidden="true"></div>
+            <div class="plugin-detail-content">
+                <div class="plugin-detail-head">
+                    <span class="feature-chip" id="plugin-detail-category"></span>
+                    <h2 id="plugin-detail-title"></h2>
+                    <p class="hero-text" id="plugin-detail-description"></p>
+                </div>
+                <div class="plugin-detail-video-wrap" id="plugin-detail-video-wrap">
+                    <video id="plugin-detail-video" playsinline preload="metadata" muted loop></video>
+                    <p class="plugin-detail-no-video" id="plugin-detail-no-video" hidden>Aucune vidéo disponible pour ce plugin.</p>
+                </div>
+            </div>
+        </section>
+    </div>
             <span id="footer-runtime">Nightcord plugin index</span>
             <span>Feature-heavy on purpose: this page is the catalog, not a teaser.</span>
         </footer>

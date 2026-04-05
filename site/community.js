@@ -57,12 +57,18 @@ function renderHierarchy(items) {
         return;
     }
 
-    container.innerHTML = items.map((item) => `
-        <article class="discord-hierarchy-item">
-            <span class="discord-hierarchy-bullet"></span>
-            <span class="discord-hierarchy-name"># ${item.name}</span>
-        </article>
-    `).join('');
+    container.innerHTML = items.map((item) => {
+        if (item.type === 'category') {
+            return `<div class="discord-hierarchy-category">${escapeHtml(item.name)}</div>`;
+        }
+        const icon = item.type === 'voice' ? '🔊' : '#';
+        return `
+            <article class="discord-hierarchy-item">
+                <span class="discord-hierarchy-icon">${icon}</span>
+                <span class="discord-hierarchy-name">${escapeHtml(item.name)}</span>
+            </article>
+        `;
+    }).join('');
 }
 
 function renderMembers(members) {
@@ -117,9 +123,6 @@ function renderDiscord(data) {
 
     renderHierarchy(Array.isArray(data.hierarchy) ? data.hierarchy : []);
     renderMembers(Array.isArray(data.members) ? data.members : []);
-
-    const source = data.widget_enabled ? 'Live widget + invite data loaded.' : 'Live invite data loaded. Detailed hierarchy falls back when widget is unavailable.';
-    setStatus(source, false);
 }
 
 function renderTeamMembers(containerId, members) {
@@ -134,20 +137,20 @@ function renderTeamMembers(containerId, members) {
         const avatar = member.avatar_url
             ? `<img class="team-avatar-image" src="${escapeHtml(member.avatar_url)}" alt="">`
             : `<span class="team-avatar-fallback">${escapeHtml(member.global_name.slice(0, 1))}</span>`;
-        const banner = member.banner_url
-            ? `style="background-image: linear-gradient(180deg, rgba(10,10,12,0.15), rgba(10,10,12,0.9)), url('${escapeHtml(member.banner_url)}');"`
-            : '';
+
+        const statusMap = { online: 'Online', idle: 'Away', dnd: 'Do Not Disturb', offline: 'Offline' };
+        const statusLabel = member.custom_status
+            ? escapeHtml(member.custom_status)
+            : (member.blurb ? escapeHtml(member.blurb) : statusMap[member.status] || 'Offline');
 
         return `
-            <article class="team-card glass-dark" ${banner}>
+            <article class="team-card glass-dark">
                 <div class="team-avatar-wrap">
                     <div class="team-avatar">${avatar}</div>
                     <span class="discord-status-dot discord-status-${escapeHtml(member.status || 'offline')}"></span>
                 </div>
                 <h4>${escapeHtml(member.global_name)}</h4>
-                <div class="team-handle">@${escapeHtml(member.tag || member.username)}</div>
-                <div class="team-role">${escapeHtml(formatTeamRole(member.role))}</div>
-                <p>${escapeHtml(member.blurb || '')}</p>
+                <p>${statusLabel}</p>
             </article>
         `;
     }).join('');
@@ -162,6 +165,9 @@ function renderTeam(data) {
     const members = Array.isArray(data.members) ? data.members : [];
     renderTeamMembers('team-owner-grid', members.filter((member) => member.section === 'Owner'));
     renderTeamMembers('team-core-grid', members.filter((member) => member.section === 'Team'));
+    renderTeamMembers('team-moderation-grid', members.filter((member) => member.section === 'Moderation'));
+    renderTeamMembers('team-helper-grid', members.filter((member) => member.section === 'Helper'));
+    renderTeamMembers('team-contributor-grid', members.filter((member) => member.section === 'Contributor'));
 }
 
 async function bootCommunityDiscord() {
@@ -188,6 +194,9 @@ async function bootCommunityTeam() {
         }
         renderTeamMembers('team-owner-grid', []);
         renderTeamMembers('team-core-grid', []);
+        renderTeamMembers('team-moderation-grid', []);
+        renderTeamMembers('team-helper-grid', []);
+        renderTeamMembers('team-contributor-grid', []);
     }
 }
 

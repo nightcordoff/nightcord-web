@@ -6,6 +6,7 @@ import hmac
 import json
 import secrets
 import sqlite3
+
 from datetime import datetime, timedelta, timezone
 from functools import partial
 from http import HTTPStatus
@@ -14,6 +15,7 @@ from pathlib import Path
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 from urllib.parse import urlparse
+import os
 
 
 ROOT_DIR = Path(__file__).resolve().parent
@@ -29,11 +31,40 @@ DEFAULT_SUPERADMIN_PASSWORD = "NightcordRoot!2026"
 DEFAULT_SUPERADMIN_NAME = "Nightcord Root"
 DEFAULT_SUPERADMIN_TITLE = "Founder"
 DISCORD_INVITE_CODE = "nightcordfr"
+DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "")
+DISCORD_GUILD_ID = "1477103987282022481"
 DISCORD_CACHE_SECONDS = 90
 COMMUNITY_TEAM_CACHE_SECONDS = 300
 COMMUNITY_TEAM_MEMBERS = [
     {"id": "1086802921984893038", "role": "Principal Developer", "section": "Owner", "blurb": "Core direction, product decisions, and the main Nightcord vision."},
-    {"id": "417325005945176064", "role": "Co-Developer", "section": "Team", "blurb": "Build support, implementation work, and shared development across the site and client."},
+    {"id": "1172305545554825259", "role": "Co-Owner", "section": "Owner", "blurb": "Co-ownership and strategic decisions alongside the principal developer."},
+    {"id": "417325005945176064", "role": "Developer", "section": "Team", "blurb": "Build support, implementation work, and shared development across the site and client."},
+    {"id": "407134577748869122", "role": "Developer", "section": "Team", "blurb": "Development and feature contributions to Nightcord."},
+    {"id": "587626543874834463", "role": "Developer & Developer BOT", "section": "Team", "blurb": "Bot development and automation tooling for Nightcord."},
+    {"id": "1356682833954996376", "role": "Developer Sécurité", "section": "Team", "blurb": "Security auditing and hardening across the Nightcord ecosystem."},
+    {"id": "1463560204259164404", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
+    {"id": "1039978099548377088", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
+    {"id": "1467485804833275974", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
+    {"id": "853703614656806922", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
+    {"id": "1214655422980423731", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
+    {"id": "156817624892702720", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "119359281173626882", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1483111868980531240", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1006980582212907048", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "834125824038010881", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1386034334980509706", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1447226822294114444", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1303838137554042894", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "694964595672219778", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "889101384287395860", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1447999207834386533", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1405562159622131914", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1479593008965091488", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "223603822927282187", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1187007193074110506", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1467485804833275974", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1341130103203041302", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1256361101961199666", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
 ]
 PAGE_ROUTES = {
     "/": "/index.html",
@@ -345,11 +376,68 @@ def fetch_remote_json(url: str) -> dict[str, object]:
         return json.loads(response.read().decode("utf-8"))
 
 
+def discord_bot_request(method: str, endpoint: str, body: dict | None = None) -> dict:
+    url = f"https://discord.com/api/v10{endpoint}"
+    data = json.dumps(body).encode("utf-8") if body else None
+    request = urllib_request.Request(
+        url,
+        data=data,
+        method=method,
+        headers={
+            "Authorization": f"Bot {DISCORD_BOT_TOKEN}",
+            "User-Agent": "Nightcord/1.0",
+            "Content-Type": "application/json",
+        },
+    )
+    with urllib_request.urlopen(request, timeout=8) as response:
+        raw = response.read().decode("utf-8")
+        return json.loads(raw) if raw.strip() else {}
+
+
+def enable_discord_widget() -> None:
+    try:
+        discord_bot_request("PATCH", f"/guilds/{DISCORD_GUILD_ID}/widget", {"enabled": True, "channel_id": None})
+        print("Discord widget enabled successfully.")
+    except Exception as exc:
+        print(f"Could not enable Discord widget: {exc}")
+
+
+def fetch_guild_presences() -> list[dict]:
+    try:
+        members_data = discord_bot_request("GET", f"/guilds/{DISCORD_GUILD_ID}/members?limit=100")
+        if not isinstance(members_data, list):
+            return []
+        result = []
+        for m in members_data:
+            user = m.get("user", {})
+            uid = str(user.get("id", ""))
+            result.append({
+                "id": uid,
+                "username": str(user.get("username", "")),
+                "global_name": str(user.get("global_name") or user.get("username", "")),
+                "avatar_url": f"https://cdn.discordapp.com/avatars/{uid}/{user['avatar']}.png" if user.get("avatar") else f"https://cdn.discordapp.com/embed/avatars/{int(uid or '0') % 5}.png",
+            })
+        return result
+    except Exception as exc:
+        print(f"Could not fetch guild members: {exc}")
+        return []
+
+
 def get_public_discord_user(user_id: str) -> dict[str, object]:
     payload = fetch_remote_json(f"https://japi.rest/discord/v1/user/{user_id}")
     data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
     presence = payload.get("presence") if isinstance(payload.get("presence"), dict) else {}
-    status = str(presence.get("discord_status") or "offline")
+    activities = presence.get("activities")
+    custom_status = ""
+    activity_name = ""
+    if isinstance(activities, list):
+        for act in activities:
+            if isinstance(act, dict):
+                if act.get("type") == 4 and act.get("state"):
+                    custom_status = str(act["state"])
+                elif act.get("name"):
+                    activity_name = str(act["name"])
+    status = str(presence.get("status") or presence.get("discord_status") or "offline")
 
     return {
         "id": user_id,
@@ -358,6 +446,8 @@ def get_public_discord_user(user_id: str) -> dict[str, object]:
         "avatar_url": data.get("avatarURL") or data.get("defaultAvatarURL"),
         "banner_url": data.get("bannerURL"),
         "status": status,
+        "custom_status": custom_status,
+        "activity": activity_name,
         "tag": str(data.get("tag") or data.get("username") or user_id),
     }
 
@@ -369,29 +459,70 @@ def get_community_team_data() -> dict[str, object]:
         if now_utc() - cached_timestamp < timedelta(seconds=COMMUNITY_TEAM_CACHE_SECONDS):
             return cached_payload
 
+    # Batch fetch all guild members at once to avoid rate limits
+    guild_members_by_id = {}
+    try:
+        batch = discord_bot_request("GET", f"/guilds/{DISCORD_GUILD_ID}/members?limit=1000")
+        if isinstance(batch, list):
+            for gm in batch:
+                user = gm.get("user", {})
+                uid = str(user.get("id", ""))
+                avatar = user.get("avatar")
+                guild_members_by_id[uid] = {
+                    "username": str(user.get("username") or uid),
+                    "global_name": str(user.get("global_name") or user.get("username") or uid),
+                    "avatar_url": (
+                        f"https://cdn.discordapp.com/avatars/{uid}/{avatar}.png?size=128"
+                        if avatar
+                        else f"https://cdn.discordapp.com/embed/avatars/{int(uid or '0') % 5}.png"
+                    ),
+                }
+    except Exception as exc:
+        print(f"Could not batch fetch guild members: {exc}")
+
     members = []
     for member in COMMUNITY_TEAM_MEMBERS:
-        try:
-            profile = get_public_discord_user(str(member["id"]))
-        except (urllib_error.URLError, urllib_error.HTTPError, TimeoutError, json.JSONDecodeError, ValueError):
-            profile = {
-                "id": str(member["id"]),
-                "username": str(member["id"]),
-                "global_name": str(member["id"]),
-                "avatar_url": f"https://cdn.discordapp.com/embed/avatars/{int(str(member['id'])) % 5}.png",
-                "banner_url": None,
-                "status": "offline",
-                "tag": str(member["id"]),
-            }
+        uid = str(member["id"])
+        gm = guild_members_by_id.get(uid)
+        if gm:
+            username = gm["username"]
+            global_name = gm["global_name"]
+            avatar_url = gm["avatar_url"]
+        else:
+            # Not in guild: fallback to Discord default avatar and ID as name
+            username = member.get("username") or uid
+            global_name = member.get("global_name") or username
+            avatar_url = f"https://cdn.discordapp.com/embed/avatars/{int(uid) % 5}.png"
+        members.append({
+            "id": uid,
+            "username": username,
+            "global_name": global_name,
+            "avatar_url": avatar_url,
+            "banner_url": None,
+            "status": "offline",
+            "custom_status": "",
+            "activity": "",
+            "tag": username,
+            "role": member["role"],
+            "section": member["section"],
+            "blurb": member["blurb"],
+        })
 
-        profile.update(
-            {
-                "role": member["role"],
-                "section": member["section"],
-                "blurb": member["blurb"],
-            }
-        )
-        members.append(profile)
+    # Apply widget presence data
+    widget_presences = {}
+    try:
+        widget = fetch_remote_json(f"https://discord.com/api/guilds/{DISCORD_GUILD_ID}/widget.json")
+        for wm in (widget.get("members") or []):
+            wname = str(wm.get("username", ""))
+            wstatus = str(wm.get("status", "offline"))
+            widget_presences[wname] = wstatus
+    except Exception:
+        pass
+
+    for m in members:
+        widget_status = widget_presences.get(m["username"]) or widget_presences.get(m["global_name"])
+        if widget_status:
+            m["status"] = widget_status
 
     payload = {
         "title": "Meet the Team",
@@ -453,52 +584,87 @@ def get_discord_community_data() -> dict[str, object]:
         )
 
         if guild_id:
+            # Get widget for online presence count
             try:
                 widget = fetch_remote_json(f"https://discord.com/api/guilds/{guild_id}/widget.json")
-                channels = widget.get("channels") if isinstance(widget.get("channels"), list) else []
-                members = widget.get("members") if isinstance(widget.get("members"), list) else []
                 payload.update(
                     {
                         "source": "widget",
                         "widget_enabled": True,
                         "online_count": widget.get("presence_count") or payload["online_count"],
                         "invite_url": str(widget.get("instant_invite") or invite_url),
-                        "hierarchy": [
-                            {
-                                "name": str(channel.get("name", "Unnamed channel")),
-                                "position": int(channel.get("position", 0)),
-                            }
-                            for channel in sorted(channels, key=lambda item: int(item.get("position", 0)))[:8]
-                        ],
-                        "members": [
-                            {
-                                "username": str(member.get("username", "Unknown")),
-                                "status": str(member.get("status", "offline")),
-                                "avatar_url": member.get("avatar_url"),
-                            }
-                            for member in members[:10]
-                        ],
                         "last_synced": now_iso(),
                     }
                 )
             except (urllib_error.URLError, urllib_error.HTTPError, TimeoutError, json.JSONDecodeError, ValueError):
                 pass
+
+            # Afficher tous les membres avec leur vrai statut (bot + widget)
+            try:
+                # 1. Récupère tous les membres via le bot
+                all_members = discord_bot_request("GET", f"/guilds/{guild_id}/members?limit=1000")
+                # 2. Récupère la présence réelle via le widget
+                widget_members = fetch_remote_json(f"https://discord.com/api/guilds/{guild_id}/widget.json")
+                widget_status_by_name = {}
+                if isinstance(widget_members.get("members"), list):
+                    for wm in widget_members["members"]:
+                        # Discord widget n’a pas l’ID, on matche sur le username (pas parfait mais mieux que rien)
+                        widget_status_by_name[str(wm.get("username", "")).lower()] = str(wm.get("status", "offline"))
+                member_list = []
+                for gm in (all_members if isinstance(all_members, list) else []):
+                    user = gm.get("user", {})
+                    uid = str(user.get("id", ""))
+                    if user.get("bot"):
+                        continue
+                    avatar = user.get("avatar")
+                    avatar_url = (
+                        f"https://cdn.discordapp.com/avatars/{uid}/{avatar}.png?size=64"
+                        if avatar
+                        else f"https://cdn.discordapp.com/embed/avatars/{int(uid or '0') % 5}.png"
+                    )
+                    display_name = str(user.get("global_name") or user.get("username") or uid)
+                    # Statut : widget > offline
+                    status = widget_status_by_name.get(str(user.get("username", "")).lower(), "offline")
+                    member_list.append({
+                        "username": display_name,
+                        "status": status,
+                        "avatar_url": avatar_url,
+                    })
+                # Trie par statut puis nom
+                status_order = {"online": 0, "idle": 1, "dnd": 2, "offline": 3}
+                member_list.sort(key=lambda m: (status_order.get(m["status"], 3), m["username"].lower()))
+                payload["members"] = member_list
+            except Exception as exc:
+                print(f"Could not fetch all guild members: {exc}")
     except (urllib_error.URLError, urllib_error.HTTPError, TimeoutError, json.JSONDecodeError, ValueError):
         pass
 
     if not payload["hierarchy"]:
-        hierarchy = []
-        entry_channel = payload.get("entry_channel")
-        if isinstance(entry_channel, str) and entry_channel:
-            hierarchy.append({"name": entry_channel, "position": 0})
-        hierarchy.extend(
-            [
-                {"name": "announcements", "position": 1},
-                {"name": "support", "position": 2},
-                {"name": "nightcord-talk", "position": 3},
-                {"name": "soundcord", "position": 4},
-            ]
-        )
+        hierarchy = [
+            {"name": "Info", "type": "category"},
+            {"name": "hi", "type": "channel"},
+            {"name": "announcement", "type": "channel"},
+            {"name": "community-manager", "type": "channel"},
+            {"name": "soundcord", "type": "channel"},
+            {"name": "NightCord development", "type": "category"},
+            {"name": "news", "type": "channel"},
+            {"name": "update", "type": "channel"},
+            {"name": "source-code", "type": "channel"},
+            {"name": "tutorial", "type": "channel"},
+            {"name": "download", "type": "channel"},
+            {"name": "contributors", "type": "channel"},
+            {"name": "safe-check", "type": "channel"},
+            {"name": "community", "type": "category"},
+            {"name": "chat", "type": "channel"},
+            {"name": "help", "type": "channel"},
+            {"name": "idea", "type": "channel"},
+            {"name": "bug-report", "type": "channel"},
+            {"name": "voice", "type": "category"},
+            {"name": "voice 1", "type": "voice"},
+            {"name": "voice-2", "type": "voice"},
+            {"name": "voice-3", "type": "voice"},
+            {"name": "prv", "type": "voice"},
+        ]
         payload["hierarchy"] = hierarchy
 
     DISCORD_COMMUNITY_CACHE["timestamp"] = now_utc()
@@ -841,6 +1007,8 @@ class NightcordHandler(SimpleHTTPRequestHandler):
 
 def main() -> None:
     ensure_database()
+    if DISCORD_BOT_TOKEN:
+        enable_discord_widget()
     handler = partial(NightcordHandler, directory=str(SITE_DIR))
     server = ThreadingHTTPServer((HOST, PORT), handler)
     print(f"Nightcord full-stack app running at http://{HOST}:{PORT}")
