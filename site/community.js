@@ -31,22 +31,25 @@ function setStatus(message, error = false) {
 
 function formatTeamRole(role) {
     const normalized = String(role || '').toLowerCase();
+    if (normalized.includes('web dev principal')) {
+        return 'Web dev principal';
+    }
     if (normalized.includes('principal developer')) {
-        return '👑 Principal Developer';
+        return 'Principal Developer';
     }
     if (normalized.includes('co-developer')) {
-        return '🛠️ Co-Developer';
+        return 'Co-Developer';
     }
     if (normalized.includes('developer')) {
-        return '💻 Developer';
+        return 'Developer';
     }
     if (normalized.includes('owner')) {
-        return '👑 Owner';
+        return 'Owner';
     }
     if (normalized.includes('team')) {
-        return '✨ Team';
+        return 'Team';
     }
-    return `✨ ${role}`.trim();
+    return String(role || '').trim();
 }
 
 function renderHierarchy(items) {
@@ -87,13 +90,13 @@ function renderMembers(members) {
         return `
             <article class="discord-member-item">
                 <div class="discord-member-meta">
-                    ${avatar}
-                    <div>
+                    <div class="discord-member-avatar-wrap">
+                        ${avatar}
+                    </div>
+                    <div class="discord-member-copy">
                         <strong>${member.username}</strong>
-                        <span>${member.status}</span>
                     </div>
                 </div>
-                <span class="discord-status-dot discord-status-${member.status}"></span>
             </article>
         `;
     }).join('');
@@ -137,8 +140,12 @@ function renderTeamMembers(containerId, members) {
         const avatar = member.avatar_url
             ? `<img class="team-avatar-image" src="${escapeHtml(member.avatar_url)}" alt="">`
             : `<span class="team-avatar-fallback">${escapeHtml(member.global_name.slice(0, 1))}</span>`;
+        const avatarDecoration = member.avatar_decoration_url
+            ? `<img class="team-avatar-decoration" src="${escapeHtml(member.avatar_decoration_url)}" alt="">`
+            : '';
 
         const statusMap = { online: 'Online', idle: 'Away', dnd: 'Do Not Disturb', offline: 'Offline' };
+        const roleLabel = formatTeamRole(member.role || '');
         const statusLabel = member.custom_status
             ? escapeHtml(member.custom_status)
             : (member.blurb ? escapeHtml(member.blurb) : statusMap[member.status] || 'Offline');
@@ -147,9 +154,11 @@ function renderTeamMembers(containerId, members) {
             <article class="team-card glass-dark">
                 <div class="team-avatar-wrap">
                     <div class="team-avatar">${avatar}</div>
+                    ${avatarDecoration}
                     <span class="discord-status-dot discord-status-${escapeHtml(member.status || 'offline')}"></span>
                 </div>
                 <h4>${escapeHtml(member.global_name)}</h4>
+                <div class="team-role">${escapeHtml(roleLabel)}</div>
                 <p>${statusLabel}</p>
             </article>
         `;

@@ -1349,6 +1349,16 @@ body[data-page="home"] .moon-disc {
     object-fit: cover;
 }
 
+.team-avatar-decoration {
+    position: absolute;
+    inset: -12px;
+    width: calc(100% + 24px);
+    height: calc(100% + 24px);
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
+}
+
 .team-avatar-fallback {
     font-family: 'Syne', sans-serif;
     font-size: 2rem;
@@ -1382,11 +1392,15 @@ body[data-page="home"] .moon-disc {
 }
 
 .team-role {
-    display: none;
+    display: block;
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.9rem;
+    font-weight: 700;
 }
 
 .team-card p {
-    margin: 4px auto 0;
+    margin: 8px auto 0;
     max-width: 280px;
     color: rgba(255, 255, 255, 0.45);
     font-size: 0.82rem;
@@ -1539,6 +1553,11 @@ body[data-page="home"] .moon-disc {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
+}
+
+.discord-member-copy {
+    min-width: 0;
 }
 
 .discord-member-meta strong,
@@ -1546,10 +1565,15 @@ body[data-page="home"] .moon-disc {
     display: block;
 }
 
-.discord-member-meta span {
-    color: var(--muted);
-    margin-top: 4px;
-    text-transform: capitalize;
+.discord-member-meta strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.discord-member-avatar-wrap {
+    position: relative;
+    flex: 0 0 auto;
 }
 
 .discord-member-avatar {
@@ -1566,6 +1590,7 @@ body[data-page="home"] .moon-disc {
     color: rgba(255, 255, 255, 0.9);
     font-weight: 700;
 }
+
 
 .discord-status-dot {
     display: block;

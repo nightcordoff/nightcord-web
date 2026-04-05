@@ -1,4 +1,4 @@
-.PHONY: help install front back dev build python check-linux-node docker-build docker-up docker-down
+.PHONY: help install front back dev build python check-linux-node
 
 SHELL := /bin/bash
 
@@ -23,9 +23,6 @@ help:
 	@printf "  make dev      Start front-end and back-end together\n"
 	@printf "  make build    Build front-end and back-end\n"
 	@printf "  make python   Start the current Python runtime on port 4173\n"
-	@printf "  make docker-build  Build Docker images\n"
-	@printf "  make docker-up     Start Docker stack\n"
-	@printf "  make docker-down   Stop Docker stack\n"
 
 install: check-linux-node
 	npm install
@@ -46,12 +43,3 @@ build: check-linux-node
 
 python:
 	python3 back-end/server.py
-
-docker-build:
-	docker-compose build
-
-docker-up:
-	docker-compose up --build
-
-docker-down:
-	docker-compose down

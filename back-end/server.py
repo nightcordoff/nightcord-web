@@ -4,6 +4,7 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import secrets
 import sqlite3
 
@@ -15,7 +16,6 @@ from pathlib import Path
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 from urllib.parse import urlparse
-import os
 
 
 ROOT_DIR = Path(__file__).resolve().parent
@@ -23,6 +23,27 @@ PROJECT_DIR = ROOT_DIR.parent
 SITE_DIR = PROJECT_DIR / "site"
 DATA_DIR = ROOT_DIR / "data"
 DB_PATH = DATA_DIR / "nightcord.db"
+
+
+def load_env_file(env_path: Path) -> None:
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+load_env_file(PROJECT_DIR / ".env")
+
 HOST = "127.0.0.1"
 PORT = 4173
 SESSION_DURATION_DAYS = 14
@@ -36,9 +57,9 @@ DISCORD_GUILD_ID = "1477103987282022481"
 DISCORD_CACHE_SECONDS = 90
 COMMUNITY_TEAM_CACHE_SECONDS = 300
 COMMUNITY_TEAM_MEMBERS = [
-    {"id": "1086802921984893038", "role": "Principal Developer", "section": "Owner", "blurb": "Core direction, product decisions, and the main Nightcord vision."},
+    {"id": "1086802921984893038", "role": "Owner", "section": "Owner", "blurb": "Core direction, product decisions, and the main Nightcord vision."},
     {"id": "1172305545554825259", "role": "Co-Owner", "section": "Owner", "blurb": "Co-ownership and strategic decisions alongside the principal developer."},
-    {"id": "417325005945176064", "role": "Developer", "section": "Team", "blurb": "Build support, implementation work, and shared development across the site and client."},
+    {"id": "417325005945176064", "role": "Developer", "section": "Team", "blurb": "Lead web development across the Nightcord site and client surfaces."},
     {"id": "407134577748869122", "role": "Developer", "section": "Team", "blurb": "Development and feature contributions to Nightcord."},
     {"id": "587626543874834463", "role": "Developer & Developer BOT", "section": "Team", "blurb": "Bot development and automation tooling for Nightcord."},
     {"id": "1356682833954996376", "role": "Developer Sécurité", "section": "Team", "blurb": "Security auditing and hardening across the Nightcord ecosystem."},
@@ -444,12 +465,24 @@ def get_public_discord_user(user_id: str) -> dict[str, object]:
         "username": str(data.get("username") or user_id),
         "global_name": str(data.get("global_name") or data.get("username") or user_id),
         "avatar_url": data.get("avatarURL") or data.get("defaultAvatarURL"),
+        "avatar_decoration_url": None,
         "banner_url": data.get("bannerURL"),
         "status": status,
         "custom_status": custom_status,
         "activity": activity_name,
         "tag": str(data.get("tag") or data.get("username") or user_id),
     }
+
+
+def build_avatar_decoration_url(avatar_decoration_data: object) -> str | None:
+    if not isinstance(avatar_decoration_data, dict):
+        return None
+
+    asset = str(avatar_decoration_data.get("asset") or "").strip()
+    if not asset:
+        return None
+
+    return f"https://cdn.discordapp.com/avatar-decoration-presets/{asset}.png?size=160&passthrough=true"
 
 
 def get_community_team_data() -> dict[str, object]:
@@ -476,6 +509,7 @@ def get_community_team_data() -> dict[str, object]:
                         if avatar
                         else f"https://cdn.discordapp.com/embed/avatars/{int(uid or '0') % 5}.png"
                     ),
+                    "avatar_decoration_url": build_avatar_decoration_url(user.get("avatar_decoration_data")),
                 }
     except Exception as exc:
         print(f"Could not batch fetch guild members: {exc}")
@@ -488,16 +522,19 @@ def get_community_team_data() -> dict[str, object]:
             username = gm["username"]
             global_name = gm["global_name"]
             avatar_url = gm["avatar_url"]
+            avatar_decoration_url = gm.get("avatar_decoration_url")
         else:
             # Not in guild: fallback to Discord default avatar and ID as name
             username = member.get("username") or uid
             global_name = member.get("global_name") or username
             avatar_url = f"https://cdn.discordapp.com/embed/avatars/{int(uid) % 5}.png"
+            avatar_decoration_url = None
         members.append({
             "id": uid,
             "username": username,
             "global_name": global_name,
             "avatar_url": avatar_url,
+            "avatar_decoration_url": avatar_decoration_url,
             "banner_url": None,
             "status": "offline",
             "custom_status": "",
