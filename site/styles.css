@@ -1,5 +1,9 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,301,400,401,500,501,700,701,900,901,1,2&f[]=jet-brains-mono@101,200,201,300,301,400,401,500,501,600,601,700,701,800,801,1,2&display=swap');
+
 :root {
     color-scheme: dark;
+    --font-sans: 'Satoshi', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     --bg: #050505;
     --surface: rgba(14, 14, 16, 0.84);
     --surface-soft: rgba(255, 255, 255, 0.035);
@@ -30,7 +34,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-sans);
     background: #000;
 }
 
@@ -61,12 +65,7 @@ body::before {
 }
 
 body::after {
-    background: radial-gradient(circle at 50% -12%, rgba(255, 255, 255, 0.045), transparent 28%);
-}
-
-body[data-page="home"] {
-    --pointer-x: 50vw;
-    --pointer-y: 34vh;
+    background: none;
 }
 
 .fx-canvas,
@@ -120,6 +119,26 @@ select {
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(3px);
+        box-shadow:
+            0 0 12px 3px rgba(255, 255, 255, 0.12),
+            0 0 32px 8px rgba(200, 220, 255, 0.08),
+            0 0 56px 16px rgba(180, 200, 255, 0.04);
+        animation: cursor-aura-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes cursor-aura-pulse {
+        0%, 100% {
+            box-shadow:
+                0 0 12px 3px rgba(255, 255, 255, 0.12),
+                0 0 32px 8px rgba(200, 220, 255, 0.08),
+                0 0 56px 16px rgba(180, 200, 255, 0.04);
+        }
+        50% {
+            box-shadow:
+                0 0 16px 5px rgba(255, 255, 255, 0.18),
+                0 0 44px 14px rgba(200, 220, 255, 0.11),
+                0 0 72px 24px rgba(180, 200, 255, 0.06);
+        }
     }
 
     .cursor-dot {
@@ -140,6 +159,10 @@ select {
         height: 44px;
         border-color: rgba(255, 255, 255, 0.72);
         background: rgba(255, 255, 255, 0.06);
+        box-shadow:
+            0 0 18px 6px rgba(255, 255, 255, 0.20),
+            0 0 48px 16px rgba(200, 220, 255, 0.13),
+            0 0 80px 28px rgba(180, 200, 255, 0.07);
     }
 
     body.has-custom-cursor.cursor-hover .cursor-dot {
@@ -167,6 +190,13 @@ select {
 .fx-canvas {
     z-index: 0;
     opacity: 0.48;
+}
+
+.sparkle-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .backdrop-grid {
@@ -221,18 +251,9 @@ select {
     pointer-events: none;
 }
 
-.moon-cursor-glow,
 .starfield {
     position: absolute;
     inset: 0;
-}
-
-.moon-cursor-glow {
-    background:
-        radial-gradient(circle 240px at var(--pointer-x) var(--pointer-y), rgba(255, 255, 255, 0.12), transparent 54%),
-        radial-gradient(circle 480px at var(--pointer-x) var(--pointer-y), rgba(255, 255, 255, 0.05), transparent 72%);
-    filter: blur(18px);
-    opacity: 0.92;
 }
 
 .star {
@@ -387,7 +408,7 @@ body[data-page="home"] .site-header {
     gap: 12px;
     color: var(--text);
     text-decoration: none;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: 1.1rem;
     font-weight: 800;
 }
@@ -422,7 +443,7 @@ body[data-page="home"] .site-header {
 .timeline-date,
 .counter-card strong,
 .metric-card span {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
 }
 
 .main-nav a {
@@ -508,19 +529,6 @@ body[data-page="home"] .site-header {
     text-align: center;
 }
 
-.moon-hero::before {
-    content: '';
-    position: absolute;
-    inset: 4% 12% auto;
-    height: 420px;
-    border-radius: 999px;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(245, 248, 255, 0.12), transparent 26%),
-        radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(255, 255, 255, 0.06), transparent 15%);
-    filter: blur(30px);
-    pointer-events: none;
-}
-
 .page-hero {
     padding: 28px;
 }
@@ -564,11 +572,30 @@ body[data-page="home"] .site-header {
     white-space: nowrap;
 }
 
+.hero-eyebrow-marquee,
+.hero-eyebrow-copy,
+.hero-home-subtitle,
+.hero-runtime h2,
+.hero-runtime .console-label {
+    font-family: var(--font-sans);
+}
+
+.hero-eyebrow-marquee {
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.hero-home-subtitle {
+    max-width: 760px;
+    font-weight: 500;
+}
+
 .eyebrow,
 .feature-chip,
 .stack-chip,
 .console-label {
-    margin: 0 0 12px;
+    margin: 0 0 16px;
     letter-spacing: 0.26em;
     font-size: 0.74rem;
     text-transform: uppercase;
@@ -592,9 +619,10 @@ body[data-page="home"] .site-header {
 .info-card h3,
 .community-card h3,
 .user-head h4 {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     margin: 0;
-    line-height: 0.96;
+    line-height: 1.06;
+    letter-spacing: -0.01em;
 }
 
 .hero-copy h1 {
@@ -648,8 +676,8 @@ body[data-page="home"] .site-header {
 .community-card p,
 .callout-panel p,
 .console-main p {
-    margin: 18px 0 0;
-    line-height: 1.72;
+    margin: 22px 0 0;
+    line-height: 1.78;
     font-size: 1rem;
 }
 
@@ -816,7 +844,7 @@ body[data-page="home"] .site-header {
 
 .contribute-modal-head h2 {
     margin: 8px 0 6px;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: clamp(1.6rem, 4vw, 2.6rem);
     line-height: 0.95;
 }
@@ -928,7 +956,7 @@ body[data-page="home"] .site-header {
     color: rgba(255, 255, 255, 0.88);
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(255, 255, 255, 0.07);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.84rem;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1132,10 +1160,6 @@ body[data-page="home"] .moon-disc:hover {
     filter: drop-shadow(0 0 36px rgba(255, 255, 255, 0.16)) drop-shadow(0 0 110px rgba(245, 247, 252, 0.2));
 }
 
-body[data-page="home"] .moon-disc {
-    transform: translate3d(calc((var(--pointer-x) - 50vw) / 70), calc((var(--pointer-y) - 32vh) / 70), 0);
-}
-
 .hero-runtime {
     width: min(100%, 520px);
     margin-top: 24px;
@@ -1144,7 +1168,7 @@ body[data-page="home"] .moon-disc {
 }
 
 .hero-runtime h2 {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     margin: 6px 0 0;
     font-size: clamp(1.6rem, 4vw, 2.4rem);
 }
@@ -1360,7 +1384,7 @@ body[data-page="home"] .moon-disc {
 }
 
 .team-avatar-fallback {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: 2rem;
     color: rgba(255, 255, 255, 0.92);
 }
@@ -1453,7 +1477,7 @@ body[data-page="home"] .moon-disc {
     overflow: hidden;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: 2rem;
 }
 
@@ -1687,7 +1711,7 @@ body[data-page="home"] .moon-disc {
 .project-collection-head h1 {
     max-width: 720px;
     margin: 10px 0 0;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: clamp(2rem, 4vw, 3.3rem);
     line-height: 0.95;
 }
@@ -1706,7 +1730,7 @@ body[data-page="home"] .moon-disc {
     padding: 9px 14px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.09);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.76rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -1803,7 +1827,7 @@ body[data-page="home"] .moon-disc {
     border: 1px solid rgba(255, 138, 41, 0.22);
     color: rgba(255, 171, 98, 0.88);
     background: rgba(255, 135, 34, 0.06);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.76rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1811,7 +1835,7 @@ body[data-page="home"] .moon-disc {
 
 .project-logo-wordmark {
     margin: 0;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: clamp(4rem, 11vw, 8.6rem);
     line-height: 0.88;
     letter-spacing: -0.08em;
@@ -1829,7 +1853,7 @@ body[data-page="home"] .moon-disc {
     width: min(100%, 470px);
     margin: 0;
     color: rgba(255, 255, 255, 0.40);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.98rem;
     line-height: 1.8;
 }
@@ -1866,7 +1890,7 @@ body[data-page="home"] .moon-disc {
 
 .project-screen-downloads {
     color: rgba(255, 160, 82, 0.76);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.88rem;
 }
 
@@ -1910,7 +1934,7 @@ body[data-page="home"] .moon-disc {
     flex: 0 0 auto;
     min-width: 34px;
     color: rgba(255, 163, 87, 0.82);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.9rem;
 }
 
@@ -2071,8 +2095,14 @@ body[data-page="home"] .moon-disc {
     padding: 0 0 16px;
 }
 
+.home-release-copy {
+    width: min(100%, 980px);
+    margin: 56px auto 0;
+    padding: 28px 6px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .feature-grid,
-.plugin-grid,
 .download-grid,
 .info-grid,
 .community-grid {
@@ -2124,7 +2154,7 @@ body[data-page="home"] .moon-disc {
 }
 
 .plugin-toolbar-meta strong {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: 1.35rem;
     line-height: 1;
     color: var(--text);
@@ -2143,6 +2173,8 @@ body[data-page="home"] .moon-disc {
 .plugin-card {
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
 }
 
@@ -2174,13 +2206,13 @@ body[data-page="home"] .moon-disc {
 }
 
 .plugin-grid {
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
     margin-top: 22px;
 }
 
 .plugin-card {
-    padding: 16px;
+    padding: 18px;
     border-radius: 20px;
 }
 
@@ -2208,15 +2240,17 @@ body[data-page="home"] .moon-disc {
 }
 
 .plugin-card h3 {
-    margin: 14px 0 0;
-    font-size: 1.22rem;
-    line-height: 1.08;
+    margin: 16px 0 0;
+    font-size: 1.15rem;
+    line-height: 1.1;
 }
 
 .plugin-card p {
-    margin-top: 12px;
-    font-size: 0.94rem;
-    line-height: 1.58;
+    margin-top: 10px;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--muted);
+    flex-grow: 1;
 }
 
 .plugin-card .feature-chip {
@@ -2242,6 +2276,36 @@ body[data-page="home"] .moon-disc {
     transform: translateY(-3px);
     border-color: rgba(255, 255, 255, 0.18);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+}
+
+.plugin-video-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+}
+
+.plugin-video-badge[data-has-video="true"] {
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(207, 207, 214, 0.1);
+    border-color: rgba(207, 207, 214, 0.22);
+    color: var(--teal);
+}
+
+.plugin-video-badge[data-has-video="false"] {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .plugin-detail-modal {
@@ -2284,29 +2348,58 @@ body[data-page="home"] .moon-disc {
 
 .plugin-detail-head h2 {
     margin: 12px 0 10px;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-size: clamp(1.6rem, 4vw, 2.4rem);
     line-height: 1.05;
 }
 
 .plugin-detail-head .hero-text {
     margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 0.9rem;
+    line-height: 1.65;
     color: rgba(255, 255, 255, 0.65);
+    font-family: var(--font-mono);
 }
 
 .plugin-detail-video-wrap {
-    border-radius: 18px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 6px;
 }
 
-.plugin-detail-video-wrap video {
+.plugin-device-frame {
+    border-radius: 20px;
+    overflow: hidden;
+    background: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.plugin-device-chrome {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 16px;
+    background: #131315;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.plugin-device-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.plugin-device-dot--red    { background: #ff5f57; }
+.plugin-device-dot--yellow { background: #febc2e; }
+.plugin-device-dot--green  { background: #28c840; }
+
+.plugin-device-screen {
+    line-height: 0;
+}
+
+.plugin-device-screen video {
     display: block;
     width: 100%;
-    border-radius: 18px;
     cursor: pointer;
 }
 
@@ -2340,6 +2433,10 @@ body[data-page="home"] .moon-disc {
     margin: 28px auto 0;
     gap: 22px;
     padding: 26px 28px;
+}
+
+body[data-page="home"] .timeline-panel {
+    margin-top: 22px;
 }
 
 .timeline-item {
@@ -2438,7 +2535,7 @@ body[data-page="home"] .moon-disc {
 .preview-badge {
     border-radius: 999px;
     padding: 9px 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.78rem;
 }
 
@@ -2515,7 +2612,7 @@ body[data-page="home"] .moon-disc {
 .message-head small,
 .sidebar-user p {
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
 }
 
 .channel-row {
@@ -2700,7 +2797,7 @@ body[data-page="home"] .moon-disc {
     background: rgba(88, 101, 242, 0.14);
     border: 1px solid rgba(88, 101, 242, 0.22);
     color: #b8c0ff;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.68rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;

@@ -173,29 +173,99 @@ function bootCanvas() {
         requestAnimationFrame(animate);
     }
 
-    function syncPointerVars(x, y) {
-        document.body.style.setProperty('--pointer-x', `${x}px`);
-        document.body.style.setProperty('--pointer-y', `${y}px`);
-    }
-
     window.addEventListener('pointermove', (event) => {
         pointer.x = event.clientX;
         pointer.y = event.clientY;
-        syncPointerVars(pointer.x, pointer.y);
     }, { passive: true });
 
     window.addEventListener('resize', () => {
         resize();
         resetParticles();
-        syncPointerVars(pointer.x, pointer.y);
     });
 
     resize();
     resetParticles();
-    syncPointerVars(pointer.x, pointer.y);
     animate();
+}
+
+function bootSparkles() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    const sc = document.createElement('canvas');
+    sc.className = 'sparkle-canvas';
+    document.body.appendChild(sc);
+    const ctx = sc.getContext('2d');
+
+    // Trail: circular buffer of {x, y, t}
+    const trail = [];
+    const TRAIL_DURATION = 520; // ms before a point fully fades
+
+    function resize() {
+        sc.width  = window.innerWidth  * devicePixelRatio;
+        sc.height = window.innerHeight * devicePixelRatio;
+        sc.style.width  = window.innerWidth  + 'px';
+        sc.style.height = window.innerHeight + 'px';
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+
+    function frame(ts) {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        // Remove expired points
+        while (trail.length && ts - trail[0].t > TRAIL_DURATION) trail.shift();
+
+        if (trail.length < 2) { requestAnimationFrame(frame); return; }
+
+        // Draw each segment with alpha based on age
+        for (let i = 1; i < trail.length; i++) {
+            const p0  = trail[i - 1];
+            const p1  = trail[i];
+            // progress 0 (oldest) → 1 (newest)
+            const prog0 = 1 - (ts - p0.t) / TRAIL_DURATION;
+            const prog1 = 1 - (ts - p1.t) / TRAIL_DURATION;
+            const alpha = Math.max(0, (prog0 + prog1) / 2);
+            const width = 2.2 * alpha;
+
+            ctx.beginPath();
+            ctx.moveTo(p0.x, p0.y);
+            ctx.lineTo(p1.x, p1.y);
+            ctx.lineWidth   = width;
+            ctx.lineCap     = 'round';
+            ctx.lineJoin    = 'round';
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.7})`;
+            ctx.shadowColor = `rgba(200, 220, 255, ${alpha * 0.5})`;
+            ctx.shadowBlur  = 6 * alpha;
+            ctx.stroke();
+        }
+
+        // Soft glow at tip (newest point)
+        const tip = trail[trail.length - 1];
+        if (tip) {
+            const g = ctx.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, 18);
+            g.addColorStop(0,   'rgba(255, 255, 255, 0.18)');
+            g.addColorStop(1,   'rgba(255, 255, 255, 0)');
+            ctx.beginPath();
+            ctx.arc(tip.x, tip.y, 18, 0, Math.PI * 2);
+            ctx.fillStyle = g;
+            ctx.shadowBlur = 0;
+            ctx.fill();
+        }
+
+        requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('pointermove', (e) => {
+        trail.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+        // cap buffer size
+        if (trail.length > 300) trail.shift();
+    }, { passive: true });
+
+    window.addEventListener('resize', resize);
+    resize();
+    requestAnimationFrame(frame);
 }
 
 highlightActiveNav();
 bootCanvas();
 bootCustomCursor();
+bootSparkles();

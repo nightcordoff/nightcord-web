@@ -1,6 +1,9 @@
 import { plugins } from './plugin-catalog.js';
 
 const VIDEO_BASE = 'https://raw.githubusercontent.com/nightcordoff/nightcord-tutorials/main/videos/';
+const VIDEO_CACHE_KEY = 'nc_video_status_v1';
+
+let videoStatusMap = null;
 
 const grid = document.getElementById('plugin-grid');
 const searchInput = document.getElementById('plugin-search-input');
@@ -48,6 +51,7 @@ function renderPlugins(list) {
     } else {
         grid.innerHTML = list.map((plugin, index) => `
             <article class="plugin-card glass plugin-card-clickable" style="animation-delay:${index * 40}ms" data-stagger data-plugin-name="${plugin.name}">
+                <span class="plugin-video-badge" aria-hidden="true" title="Vérification vidéo…"></span>
                 <div class="plugin-card-top">
                     ${getPluginIcon()}
                     <span class="feature-chip">${plugin.category}</span>
@@ -61,6 +65,57 @@ function renderPlugins(list) {
     if (resultsCount) {
         resultsCount.textContent = formatResultsLabel(list.length);
     }
+
+    applyVideoBadges();
+}
+
+function applyVideoBadges() {
+    if (!videoStatusMap || !grid) return;
+    grid.querySelectorAll('[data-plugin-name]').forEach((card) => {
+        const name = card.dataset.pluginName;
+        const badge = card.querySelector('.plugin-video-badge');
+        if (!badge || !(name in videoStatusMap)) return;
+        const has = videoStatusMap[name];
+        badge.setAttribute('data-has-video', has ? 'true' : 'false');
+        badge.title = has ? 'Vidéo disponible' : '';
+        badge.innerHTML = has
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>`
+            : ``;
+    });
+}
+
+async function checkVideoAvailability() {
+    try {
+        const raw = sessionStorage.getItem(VIDEO_CACHE_KEY);
+        if (raw) {
+            videoStatusMap = JSON.parse(raw);
+            applyVideoBadges();
+            return;
+        }
+    } catch {}
+
+    const results = await Promise.allSettled(
+        plugins.map(async (plugin) => {
+            const url = `${VIDEO_BASE}${encodeURIComponent(plugin.name)}.mp4`;
+            try {
+                const res = await fetch(url, { method: 'HEAD' });
+                return { name: plugin.name, hasVideo: res.ok };
+            } catch {
+                return { name: plugin.name, hasVideo: false };
+            }
+        })
+    );
+
+    videoStatusMap = {};
+    results.forEach((r) => {
+        if (r.status === 'fulfilled') videoStatusMap[r.value.name] = r.value.hasVideo;
+    });
+
+    try {
+        sessionStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify(videoStatusMap));
+    } catch {}
+
+    applyVideoBadges();
 }
 
 function filterPlugins(query) {
@@ -82,6 +137,7 @@ searchInput?.addEventListener('input', (event) => {
 });
 
 renderPlugins(plugins);
+checkVideoAvailability();
 
 function openPluginModal(pluginName) {
     const plugin = plugins.find((p) => p.name === pluginName);
@@ -91,19 +147,26 @@ function openPluginModal(pluginName) {
     modalCategory.textContent = plugin.category;
     modalDescription.textContent = plugin.description;
 
-    const videoUrl = `${VIDEO_BASE}${encodeURIComponent(plugin.name)}.mp4`;
-    modalVideo.src = videoUrl;
-    modalVideo.hidden = false;
-    modalNoVideo.hidden = true;
+    const hasVideo = videoStatusMap ? videoStatusMap[plugin.name] : true;
 
-    modalVideo.onerror = () => {
-        modalVideo.hidden = true;
-        modalNoVideo.hidden = false;
-    };
+    if (hasVideo !== false) {
+        const videoUrl = `${VIDEO_BASE}${encodeURIComponent(plugin.name)}.mp4`;
+        modalVideo.src = videoUrl;
+        modalVideo.hidden = false;
+        modalNoVideo.hidden = true;
+        if (modalVideoWrap) modalVideoWrap.hidden = false;
 
-    modalVideo.onloadeddata = () => {
-        modalVideo.play().catch(() => {});
-    };
+        modalVideo.onerror = () => {
+            modalVideo.hidden = true;
+            modalNoVideo.hidden = false;
+        };
+
+        modalVideo.onloadeddata = () => {
+            modalVideo.play().catch(() => {});
+        };
+    } else {
+        if (modalVideoWrap) modalVideoWrap.hidden = true;
+    }
 
     modal.hidden = false;
     document.body.classList.add('modal-open');

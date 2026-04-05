@@ -54,6 +54,10 @@
         </main>
 
         <footer class="site-footer">
+            <span id="footer-runtime">Nightcord plugin index</span>
+            <span>Feature-heavy on purpose: this page is the catalog, not a teaser.</span>
+        </footer>
+    </div>
 
     <div class="modal-shell" id="plugin-detail-modal" hidden>
         <div class="modal-backdrop" data-close-plugin-modal></div>
@@ -67,15 +71,20 @@
                     <p class="hero-text" id="plugin-detail-description"></p>
                 </div>
                 <div class="plugin-detail-video-wrap" id="plugin-detail-video-wrap">
-                    <video id="plugin-detail-video" playsinline preload="metadata" muted loop></video>
+                    <div class="plugin-device-frame">
+                        <div class="plugin-device-chrome">
+                            <span class="plugin-device-dot plugin-device-dot--red"></span>
+                            <span class="plugin-device-dot plugin-device-dot--yellow"></span>
+                            <span class="plugin-device-dot plugin-device-dot--green"></span>
+                        </div>
+                        <div class="plugin-device-screen">
+                            <video id="plugin-detail-video" playsinline preload="metadata" muted loop></video>
+                        </div>
+                    </div>
                     <p class="plugin-detail-no-video" id="plugin-detail-no-video" hidden>Aucune vidéo disponible pour ce plugin.</p>
                 </div>
             </div>
         </section>
-    </div>
-            <span id="footer-runtime">Nightcord plugin index</span>
-            <span>Feature-heavy on purpose: this page is the catalog, not a teaser.</span>
-        </footer>
     </div>
 
     <script type="module" src="/shared.js"></script>
