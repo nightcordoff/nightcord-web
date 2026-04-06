@@ -269,3 +269,21 @@ highlightActiveNav();
 bootCanvas();
 bootCustomCursor();
 bootSparkles();
+
+// ── Scroll reveal ──────────────────────────────────────────────────────────
+function bootScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('[data-reveal], [data-stagger]').forEach((el) => {
+        observer.observe(el);
+    });
+}
+
+bootScrollReveal();

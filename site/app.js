@@ -6,6 +6,18 @@ const contributeState = {
     activeTimeout: null,
 };
 
+function splitWords(el, baseDelay = 0) {
+    const text = el.textContent.trim();
+    el.innerHTML = text.split(/\s+/).filter(Boolean).map((word, i) =>
+        `<span class="word-reveal" style="--wi:${i};transition-delay:calc(${baseDelay}ms + var(--wi) * 80ms)">${word}</span>`
+    ).join(' ');
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            el.querySelectorAll('.word-reveal').forEach((span) => span.classList.add('revealed'));
+        });
+    });
+}
+
 async function readJson(url, options) {
     const response = await fetch(url, options);
     if (!response.ok) {
@@ -35,8 +47,12 @@ function renderOverview(overview) {
         : [];
     document.getElementById('hero-eyebrow').textContent = overview.hero.eyebrow;
     document.getElementById('hero-eyebrow-clone').textContent = overview.hero.eyebrow;
-    document.getElementById('hero-title').textContent = overview.brand;
-    document.getElementById('hero-subtitle').textContent = overview.hero.subtitle;
+    const heroTitle = document.getElementById('hero-title');
+    heroTitle.textContent = overview.brand;
+    splitWords(heroTitle, 0);
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    heroSubtitle.textContent = overview.hero.subtitle;
+    splitWords(heroSubtitle, 160);
     document.getElementById('live-version').textContent = `Download ${overview.version}`;
     if (liveDatabase) {
         liveDatabase.textContent = '';

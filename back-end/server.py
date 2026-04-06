@@ -134,6 +134,7 @@ SEED_STACK = [
 SEED_DOWNLOADS = [
     ("stable", 1075),
     ("canary", 61),
+    ("linux", 0),
 ]
 
 DISCORD_COMMUNITY_CACHE: dict[str, object] = {
@@ -351,7 +352,7 @@ def build_overview() -> dict[str, object]:
 
     return {
         "brand": "Nightcord",
-        "version": "v1.16.6",
+        "version": "v1.18",
         "runtime": "Python + SQLite",
         "hero": {
             "eyebrow": "A Discord client packed with powerful features Discord never gave you.",
@@ -578,6 +579,8 @@ def get_community_team_data() -> dict[str, object]:
             github_url = None
             source = "fallback"
 
+        if source == "fallback":
+            continue
         members.append({
             "id": uid or None,
             "username": username,
