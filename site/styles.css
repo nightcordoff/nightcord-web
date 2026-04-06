@@ -389,17 +389,17 @@ select {
 }
 
 .site-header {
+    position: sticky;
+    top: 14px;
+    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 18px;
     padding: 16px 18px;
     border-radius: 999px;
-}
-
-body[data-page="home"] .site-header {
-    background: rgba(7, 10, 20, 0.52);
-    border-color: rgba(198, 211, 255, 0.12);
+    background: rgba(30, 30, 33, 0.88) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 .brand {
@@ -627,6 +627,33 @@ body[data-page="home"] .site-header {
     max-width: 760px;
     font-weight: 500;
     margin-top: 0;
+}
+
+/* ── Hero app screenshot ─────────────────────────────────────────────────── */
+.hero-app-frame {
+    position: relative;
+    width: min(1100px, 100%);
+    margin: 16px auto 0;
+    border-radius: 18px 18px 0 0;
+    overflow: hidden;
+    box-shadow: 0 -4px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.hero-app-frame::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 52%;
+    background: linear-gradient(to bottom, transparent, #000);
+    pointer-events: none;
+}
+
+.hero-app-screenshot {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 18px 18px 0 0;
 }
 
 .eyebrow,
