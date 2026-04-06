@@ -284,6 +284,8 @@ function bootScrollReveal() {
     document.querySelectorAll('[data-reveal], [data-stagger]').forEach((el) => {
         observer.observe(el);
     });
+
+    window.scrollRevealObserver = observer;
 }
 
 bootScrollReveal();

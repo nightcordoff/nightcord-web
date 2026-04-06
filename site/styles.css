@@ -2378,8 +2378,23 @@ body[data-page="home"] .moon-disc:hover {
     max-width: 420px;
 }
 
+@keyframes pluginCardIn {
+    from {
+        opacity: 0;
+        filter: blur(6px);
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
 .plugin-card-clickable {
     cursor: pointer;
+    animation: pluginCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
     transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 

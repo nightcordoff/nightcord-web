@@ -50,7 +50,7 @@ function renderPlugins(list) {
         `;
     } else {
         grid.innerHTML = list.map((plugin, index) => `
-            <article class="plugin-card glass plugin-card-clickable" style="animation-delay:${index * 40}ms" data-stagger data-plugin-name="${plugin.name}">
+            <article class="plugin-card glass plugin-card-clickable" style="--i:${index}" data-plugin-name="${plugin.name}">
                 <span class="plugin-video-badge" aria-hidden="true" title="Vérification vidéo…"></span>
                 <div class="plugin-card-top">
                     ${getPluginIcon()}
