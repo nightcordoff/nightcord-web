@@ -79,11 +79,11 @@ function bootCanvas() {
     }
 
     const context = canvas.getContext('2d');
-    const particles = [];
-    const particleCount = 120;
     const stars = [];
-    const starCount = 200;
+    const starCount = 280;
+    const shootingStars = [];
     const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const nebula = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
     function resize() {
         canvas.width = window.innerWidth * window.devicePixelRatio;
@@ -93,81 +93,104 @@ function bootCanvas() {
         context.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
     }
 
-    function makeParticle() {
-        return {
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            vx: (Math.random() - 0.5) * 0.35,
-            vy: (Math.random() - 0.5) * 0.35,
-            radius: 1 + Math.random() * 2.5,
-        };
-    }
-
     function makeStar() {
         return {
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
-            radius: 0.4 + Math.random() * 1.2,
-            baseAlpha: 0.15 + Math.random() * 0.45,
-            twinkleSpeed: 0.005 + Math.random() * 0.02,
+            radius: 0.3 + Math.random() * 1.4,
+            baseAlpha: 0.1 + Math.random() * 0.55,
+            twinkleSpeed: 0.004 + Math.random() * 0.018,
             twinkleOffset: Math.random() * Math.PI * 2,
+            color: Math.random() > 0.88
+                ? `rgba(180, 200, 255, `
+                : Math.random() > 0.75
+                    ? `rgba(255, 220, 180, `
+                    : `rgba(255, 255, 255, `,
         };
     }
 
-    function resetParticles() {
-        particles.length = 0;
-        for (let index = 0; index < particleCount; index += 1) {
-            particles.push(makeParticle());
-        }
+    function makeShootingStar() {
+        const startX = Math.random() * window.innerWidth * 1.2;
+        const startY = Math.random() * window.innerHeight * 0.5;
+        const angle = Math.PI / 6 + Math.random() * Math.PI / 8;
+        const speed = 6 + Math.random() * 10;
+        return {
+            x: startX, y: startY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            length: 80 + Math.random() * 140,
+            alpha: 1,
+            life: 0,
+            maxLife: 40 + Math.random() * 30,
+        };
+    }
+
+    function resetStars() {
         stars.length = 0;
-        for (let index = 0; index < starCount; index += 1) {
-            stars.push(makeStar());
-        }
+        for (let i = 0; i < starCount; i++) stars.push(makeStar());
     }
 
     let tick = 0;
+    let nextShooting = 180 + Math.random() * 240;
 
     function animate() {
-        tick += 1;
+        tick++;
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
+        // Soft nebula glow that follows mouse
+        nebula.x += (pointer.x - nebula.x) * 0.025;
+        nebula.y += (pointer.y - nebula.y) * 0.025;
+
+        const g1 = context.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, window.innerWidth * 0.55);
+        g1.addColorStop(0, `rgba(80, 60, 160, 0.07)`);
+        g1.addColorStop(0.4, `rgba(40, 30, 100, 0.04)`);
+        g1.addColorStop(1, `rgba(0, 0, 0, 0)`);
+        context.fillStyle = g1;
+        context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+        // Secondary nebula (slow drift)
+        const nx2 = window.innerWidth * 0.8 + Math.sin(tick * 0.004) * 120;
+        const ny2 = window.innerHeight * 0.3 + Math.cos(tick * 0.003) * 80;
+        const g2 = context.createRadialGradient(nx2, ny2, 0, nx2, ny2, window.innerWidth * 0.4);
+        g2.addColorStop(0, `rgba(20, 80, 120, 0.06)`);
+        g2.addColorStop(1, `rgba(0, 0, 0, 0)`);
+        context.fillStyle = g2;
+        context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+        // Stars
         for (const star of stars) {
-            const alpha = star.baseAlpha + Math.sin(tick * star.twinkleSpeed + star.twinkleOffset) * 0.2;
+            const alpha = star.baseAlpha + Math.sin(tick * star.twinkleSpeed + star.twinkleOffset) * 0.22;
             context.beginPath();
-            context.fillStyle = `rgba(255, 255, 255, ${Math.max(0.05, alpha)})`;
+            context.fillStyle = `${star.color}${Math.max(0.04, alpha)})`;
             context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
             context.fill();
         }
 
-        for (const particle of particles) {
-            particle.x += particle.vx + (pointer.x - window.innerWidth / 2) * 0.00002;
-            particle.y += particle.vy + (pointer.y - window.innerHeight / 2) * 0.00002;
-
-            if (particle.x < -20 || particle.x > window.innerWidth + 20) particle.vx *= -1;
-            if (particle.y < -20 || particle.y > window.innerHeight + 20) particle.vy *= -1;
-
-            context.beginPath();
-            context.fillStyle = 'rgba(122, 244, 209, 0.34)';
-            context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-            context.fill();
+        // Shooting stars
+        if (--nextShooting <= 0) {
+            shootingStars.push(makeShootingStar());
+            nextShooting = 200 + Math.random() * 300;
         }
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+            const s = shootingStars[i];
+            s.x += s.vx;
+            s.y += s.vy;
+            s.life++;
+            s.alpha = Math.max(0, 1 - s.life / s.maxLife);
 
-        for (let i = 0; i < particles.length; i += 1) {
-            for (let j = i + 1; j < particles.length; j += 1) {
-                const first = particles[i];
-                const second = particles[j];
-                const dx = first.x - second.x;
-                const dy = first.y - second.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 140) {
-                    context.beginPath();
-                    context.strokeStyle = `rgba(154, 134, 255, ${0.12 - distance / 1800})`;
-                    context.lineWidth = 1;
-                    context.moveTo(first.x, first.y);
-                    context.lineTo(second.x, second.y);
-                    context.stroke();
-                }
-            }
+            const tailX = s.x - s.vx * (s.length / Math.hypot(s.vx, s.vy));
+            const tailY = s.y - s.vy * (s.length / Math.hypot(s.vx, s.vy));
+            const grad = context.createLinearGradient(tailX, tailY, s.x, s.y);
+            grad.addColorStop(0, `rgba(255,255,255,0)`);
+            grad.addColorStop(1, `rgba(255,255,255,${s.alpha * 0.85})`);
+            context.beginPath();
+            context.strokeStyle = grad;
+            context.lineWidth = 1.2;
+            context.moveTo(tailX, tailY);
+            context.lineTo(s.x, s.y);
+            context.stroke();
+
+            if (s.life >= s.maxLife) shootingStars.splice(i, 1);
         }
 
         requestAnimationFrame(animate);
@@ -180,11 +203,11 @@ function bootCanvas() {
 
     window.addEventListener('resize', () => {
         resize();
-        resetParticles();
+        resetStars();
     });
 
     resize();
-    resetParticles();
+    resetStars();
     animate();
 }
 

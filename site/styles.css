@@ -74,6 +74,10 @@ body::after {
     display: none;
 }
 
+.fx-canvas {
+    display: block;
+}
+
 .home-sky {
     display: none;
 }
@@ -189,7 +193,7 @@ select {
 
 .fx-canvas {
     z-index: 0;
-    opacity: 0.48;
+    opacity: 1;
 }
 
 .sparkle-canvas {
@@ -218,29 +222,33 @@ select {
 }
 
 .aurora-a {
-    width: 320px;
-    height: 320px;
-    top: -80px;
-    left: -80px;
-    background: rgba(255, 255, 255, 0.09);
+    width: 520px;
+    height: 520px;
+    top: -120px;
+    left: -100px;
+    background: radial-gradient(circle, rgba(80, 60, 180, 0.18), transparent 70%);
+    display: block !important;
+    animation: floatAurora 16s ease-in-out infinite alternate;
 }
 
 .aurora-b {
-    width: 360px;
-    height: 360px;
-    top: 120px;
-    right: -140px;
-    background: rgba(180, 180, 180, 0.08);
-    animation-delay: -4s;
+    width: 560px;
+    height: 560px;
+    top: 80px;
+    right: -160px;
+    background: radial-gradient(circle, rgba(20, 80, 160, 0.14), transparent 70%);
+    display: block !important;
+    animation-delay: -5s;
 }
 
 .aurora-c {
-    width: 300px;
-    height: 300px;
-    bottom: -60px;
-    left: 30%;
-    background: rgba(120, 120, 120, 0.08);
-    animation-delay: -8s;
+    width: 480px;
+    height: 480px;
+    bottom: -80px;
+    left: 28%;
+    background: radial-gradient(circle, rgba(100, 40, 140, 0.13), transparent 70%);
+    display: block !important;
+    animation-delay: -10s;
 }
 
 .home-sky {

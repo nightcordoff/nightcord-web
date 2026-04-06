@@ -379,7 +379,7 @@ def build_overview() -> dict[str, object]:
         "hero": {
             "eyebrow": "A Discord client packed with powerful features Discord never gave you.",
             "title": "Nightcord",
-            "subtitle": "Native-first ambition, aggressive audio tooling, plugin power, and a feature set built for people who always hit Discord's limits.",
+            "subtitle": "Everything Discord refuses to build — already shipped.",
         },
         "database": {
             "engine": "SQLite",
