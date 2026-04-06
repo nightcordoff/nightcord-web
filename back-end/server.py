@@ -148,6 +148,27 @@ COMMUNITY_TEAM_CACHE: dict[str, object] = {
 }
 
 GITHUB_USER_CACHE: dict[str, dict] = {}
+GITHUB_RELEASE_CACHE: dict[str, object] = {"tag": None, "fetched_at": None}
+GITHUB_RELEASE_CACHE_SECONDS = 300
+GITHUB_RELEASE_REPO = "nightcordoff/nightcordclient-releases"
+
+
+def fetch_github_latest_tag() -> str:
+    cached_tag = GITHUB_RELEASE_CACHE.get("tag")
+    fetched_at = GITHUB_RELEASE_CACHE.get("fetched_at")
+    if cached_tag and fetched_at and now_utc() - fetched_at < timedelta(seconds=GITHUB_RELEASE_CACHE_SECONDS):
+        return cached_tag
+    try:
+        data = fetch_remote_json(f"https://api.github.com/repos/{GITHUB_RELEASE_REPO}/releases/latest")
+        tag = str(data.get("tag_name") or "")
+        if tag:
+            GITHUB_RELEASE_CACHE["tag"] = tag
+            GITHUB_RELEASE_CACHE["fetched_at"] = now_utc()
+            return tag
+    except Exception as exc:
+        print(f"Could not fetch GitHub latest release: {exc}")
+    fallback = cached_tag or "v1.18"
+    return fallback
 
 
 def now_utc() -> datetime:
@@ -352,7 +373,8 @@ def build_overview() -> dict[str, object]:
 
     return {
         "brand": "Nightcord",
-        "version": "v1.18",
+        "version": fetch_github_latest_tag(),
+        "github_release_url": f"https://github.com/{GITHUB_RELEASE_REPO}/releases/latest",
         "runtime": "Python + SQLite",
         "hero": {
             "eyebrow": "A Discord client packed with powerful features Discord never gave you.",

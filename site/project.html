@@ -60,7 +60,7 @@
                     <div class="project-screen-fade project-screen-fade-right" aria-hidden="true"></div>
 
                     <div class="project-screen-inner">
-                        <div class="project-version-pill">v1.16.6 - Audio Edition</div>
+                        <div class="project-version-pill" id="project-version-pill">—</div>
                         <h2 class="project-logo-wordmark">
                             <span class="project-logo-light">Sound</span><span class="project-logo-accent">cord</span>
                         </h2>
@@ -103,6 +103,12 @@
     </div>
 
     <script type="module" src="/shared.js"></script>
+    <script type="module">
+        fetch('/api/overview').then(r => r.json()).then(d => {
+            const pill = document.getElementById('project-version-pill');
+            if (pill && d.version) pill.textContent = d.version;
+        }).catch(() => {});
+    </script>
 </body>
 
 </html>
