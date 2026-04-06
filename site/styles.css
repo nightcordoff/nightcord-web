@@ -390,16 +390,45 @@ select {
 
 .site-header {
     position: sticky;
-    top: 14px;
+    top: 10px;
     z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
-    padding: 16px 18px;
+    gap: 12px;
+    padding: 8px 10px 8px 16px;
     border-radius: 999px;
-    background: rgba(30, 30, 33, 0.88) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
+    background: rgba(18, 18, 20, 0.82) !important;
+    border-color: rgba(255, 255, 255, 0.09) !important;
+    backdrop-filter: blur(28px) !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.header-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.header-download-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+
+.header-download-btn svg {
+    opacity: 0.75;
+    flex-shrink: 0;
 }
 
 .brand {
@@ -448,8 +477,9 @@ select {
 
 .main-nav a {
     color: var(--muted);
+    font-size: 0.8rem;
     text-decoration: none;
-    padding: 9px 12px;
+    padding: 6px 10px;
     border-radius: 999px;
     transition: background 180ms ease, color 180ms ease;
 }
