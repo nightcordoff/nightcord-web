@@ -56,6 +56,7 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN", "")
 DISCORD_GUILD_ID = "1477103987282022481"
 DISCORD_CACHE_SECONDS = 90
 COMMUNITY_TEAM_CACHE_SECONDS = 300
+GITHUB_USER_CACHE_SECONDS = 3600
 COMMUNITY_TEAM_MEMBERS = [
     {"id": "1086802921984893038", "role": "Owner", "section": "Owner", "blurb": "Core direction, product decisions, and the main Nightcord vision."},
     {"id": "1172305545554825259", "role": "Co-Owner", "section": "Owner", "blurb": "Co-ownership and strategic decisions alongside the principal developer."},
@@ -86,13 +87,14 @@ COMMUNITY_TEAM_MEMBERS = [
     {"id": "1467485804833275974", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1341130103203041302", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1256361101961199666", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    # Contributors only on GitHub (no Discord ID required — set id to None or omit)
+    # Example: {"id": None, "github": "octocat", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
 ]
 PAGE_ROUTES = {
     "/": "/index.html",
     "/download": "/download.html",
     "/plugins": "/plugins.html",
     "/community": "/community.html",
-    "/preview": "/preview.html",
     "/project": "/project.html",
     "/admin": "/admin.html",
 }
@@ -143,6 +145,8 @@ COMMUNITY_TEAM_CACHE: dict[str, object] = {
     "timestamp": None,
     "payload": None,
 }
+
+GITHUB_USER_CACHE: dict[str, dict] = {}
 
 
 def now_utc() -> datetime:
@@ -474,6 +478,28 @@ def get_public_discord_user(user_id: str) -> dict[str, object]:
     }
 
 
+def fetch_github_user(username: str) -> dict[str, object] | None:
+    cached = GITHUB_USER_CACHE.get(username)
+    if cached and now_utc() - cached["_fetched_at"] < timedelta(seconds=GITHUB_USER_CACHE_SECONDS):
+        return cached
+    try:
+        data = fetch_remote_json(f"https://api.github.com/users/{username}")
+        if not isinstance(data, dict) or not data.get("login"):
+            return None
+        result = {
+            "username": str(data.get("login") or username),
+            "global_name": str(data.get("name") or data.get("login") or username),
+            "avatar_url": str(data.get("avatar_url") or ""),
+            "html_url": str(data.get("html_url") or f"https://github.com/{username}"),
+            "_fetched_at": now_utc(),
+        }
+        GITHUB_USER_CACHE[username] = result
+        return result
+    except Exception as exc:
+        print(f"Could not fetch GitHub user {username}: {exc}")
+        return None
+
+
 def build_avatar_decoration_url(avatar_decoration_data: object) -> str | None:
     if not isinstance(avatar_decoration_data, dict):
         return None
@@ -516,21 +542,44 @@ def get_community_team_data() -> dict[str, object]:
 
     members = []
     for member in COMMUNITY_TEAM_MEMBERS:
-        uid = str(member["id"])
-        gm = guild_members_by_id.get(uid)
+        uid = str(member.get("id") or "")
+        github_login = member.get("github") or ""
+        gm = guild_members_by_id.get(uid) if uid else None
+
         if gm:
+            # Found on Discord guild
             username = gm["username"]
             global_name = gm["global_name"]
             avatar_url = gm["avatar_url"]
             avatar_decoration_url = gm.get("avatar_decoration_url")
-        else:
-            # Not in guild: fallback to Discord default avatar and ID as name
-            username = member.get("username") or uid
-            global_name = member.get("global_name") or username
-            avatar_url = f"https://cdn.discordapp.com/embed/avatars/{int(uid) % 5}.png"
+            source = "discord"
+            github_url = f"https://github.com/{github_login}" if github_login else None
+        elif github_login:
+            # Not in guild but has a GitHub username → fetch from GitHub API
+            gh = fetch_github_user(github_login)
+            if gh:
+                username = gh["username"]
+                global_name = gh["global_name"]
+                avatar_url = gh["avatar_url"]
+                github_url = gh["html_url"]
+            else:
+                username = github_login
+                global_name = github_login
+                avatar_url = f"https://github.com/{github_login}.png?size=128"
+                github_url = f"https://github.com/{github_login}"
             avatar_decoration_url = None
+            source = "github"
+        else:
+            # Not in guild, no GitHub info — generic fallback
+            username = member.get("username") or uid or "Unknown"
+            global_name = member.get("global_name") or username
+            avatar_url = f"https://cdn.discordapp.com/embed/avatars/{int(uid or '0') % 5}.png" if uid else "https://cdn.discordapp.com/embed/avatars/0.png"
+            avatar_decoration_url = None
+            github_url = None
+            source = "fallback"
+
         members.append({
-            "id": uid,
+            "id": uid or None,
             "username": username,
             "global_name": global_name,
             "avatar_url": avatar_url,
@@ -543,6 +592,8 @@ def get_community_team_data() -> dict[str, object]:
             "role": member["role"],
             "section": member["section"],
             "blurb": member["blurb"],
+            "source": source,
+            "github_url": github_url,
         })
 
     # Apply widget presence data
