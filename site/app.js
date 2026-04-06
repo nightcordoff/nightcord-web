@@ -53,7 +53,6 @@ function renderOverview(overview) {
     const heroSubtitle = document.getElementById('hero-subtitle');
     heroSubtitle.textContent = overview.hero.subtitle;
     splitWords(heroSubtitle, 160);
-    document.getElementById('live-version').textContent = `Download ${overview.version}`;
     if (liveDatabase) {
         liveDatabase.textContent = '';
     }

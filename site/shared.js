@@ -142,8 +142,8 @@ function bootCanvas() {
         nebula.y += (pointer.y - nebula.y) * 0.025;
 
         const g1 = context.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, window.innerWidth * 0.55);
-        g1.addColorStop(0, `rgba(80, 60, 160, 0.07)`);
-        g1.addColorStop(0.4, `rgba(40, 30, 100, 0.04)`);
+        g1.addColorStop(0, `rgba(8, 25, 55, 0.18)`);
+        g1.addColorStop(0.4, `rgba(8, 25, 55, 0.09)`);
         g1.addColorStop(1, `rgba(0, 0, 0, 0)`);
         context.fillStyle = g1;
         context.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -152,7 +152,7 @@ function bootCanvas() {
         const nx2 = window.innerWidth * 0.8 + Math.sin(tick * 0.004) * 120;
         const ny2 = window.innerHeight * 0.3 + Math.cos(tick * 0.003) * 80;
         const g2 = context.createRadialGradient(nx2, ny2, 0, nx2, ny2, window.innerWidth * 0.4);
-        g2.addColorStop(0, `rgba(20, 80, 120, 0.06)`);
+        g2.addColorStop(0, `rgba(8, 25, 55, 0.12)`);
         g2.addColorStop(1, `rgba(0, 0, 0, 0)`);
         context.fillStyle = g2;
         context.fillRect(0, 0, window.innerWidth, window.innerHeight);
@@ -292,6 +292,12 @@ highlightActiveNav();
 bootCanvas();
 bootCustomCursor();
 bootSparkles();
+
+// ── Header version ────────────────────────────────────────────────────────
+fetch('/api/overview').then(r => r.json()).then(d => {
+    const el = document.getElementById('header-version');
+    if (el && d.version) el.textContent = d.version;
+}).catch(() => {});
 
 // ── Scroll reveal ──────────────────────────────────────────────────────────
 function bootScrollReveal() {

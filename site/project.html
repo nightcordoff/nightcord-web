@@ -22,81 +22,103 @@
     <div class="site-shell">
         <header class="site-header glass">
             <a class="brand" href="/">
-                <span class="brand-mark"></span>
+                <img class="brand-mark" src="/image.png" alt="Nightcord logo" width="28" height="28">
                 <span>Nightcord</span>
             </a>
             <nav class="main-nav">
                 <a href="/" data-nav="home">Home</a>
                 <a href="/plugins" data-nav="plugins">Plugins</a>
+                <a href="/themes" data-nav="themes">Themes</a>
                 <a href="/community" data-nav="community">Community</a>
                 <a href="/project.html" data-nav="project">Project</a>
             </nav>
             <a class="header-download-btn" href="/download">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download
+                Download <span id="header-version"></span>
             </a>
         </header>
 
         <main class="page page-project" data-reveal>
-            <section class="project-stage">
-                <div class="project-stage-glow" aria-hidden="true"></div>
-                <div class="project-stage-grid" aria-hidden="true"></div>
-
-                <div class="project-collection-head">
-                    <div>
-                        <p class="eyebrow">Projects</p>
-                        <h1>Selected product experiments from the Nightcord universe.</h1>
-                    </div>
-                    <div class="project-collection-meta">
-                        <span class="project-index-pill">Project 01</span>
-                        <span class="project-next-pill">More projects soon</span>
-                    </div>
+            <section class="proj-hub">
+                <div class="proj-hub-header">
+                    <p class="eyebrow">Projects</p>
+                    <h1 class="proj-hub-title">Projects</h1>
+                    <p class="proj-hub-count" id="proj-count">3 active projects</p>
                 </div>
 
-                <article class="project-screen-card">
-                    <div class="project-screen-fade project-screen-fade-top" aria-hidden="true"></div>
-                    <div class="project-screen-fade project-screen-fade-bottom" aria-hidden="true"></div>
-                    <div class="project-screen-fade project-screen-fade-left" aria-hidden="true"></div>
-                    <div class="project-screen-fade project-screen-fade-right" aria-hidden="true"></div>
+                <div class="proj-search-wrap">
+                    <svg class="proj-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input class="proj-search" id="proj-search" type="search" placeholder="Search projects…" autocomplete="off" spellcheck="false">
+                </div>
 
-                    <div class="project-screen-inner">
-                        <div class="project-version-pill" id="project-version-pill">—</div>
-                        <h2 class="project-logo-wordmark">
-                            <span class="project-logo-light">Sound</span><span class="project-logo-accent">cord</span>
-                        </h2>
-                        <p class="project-screen-copy">Stream every track you love — no ads, no limits, no skips. Soundcord connects directly to SoundCloud's full catalog and lets you listen, save, and share music exactly the way you want.</p>
-                        <div class="project-screen-actions">
-                            <a class="button project-screen-button project-screen-button-primary" href="https://nightcord.online/soundcord" target="_blank" rel="noreferrer">
-                                <span>Open Soundcord</span>
-                            </a>
-                            <span class="project-screen-ghost">Direct access to the live site</span>
-                        </div>
-                        <div class="project-screen-downloads">113 Downloads</div>
-                    </div>
-                </article>
+                <div class="proj-grid">
 
-                <div class="project-rail">
-                    <article class="project-rail-card glass-lite project-rail-card-active">
-                        <span class="project-rail-index">01</span>
-                        <div>
-                            <strong>Soundcord</strong>
-                            <p>Audio-first standalone concept with a warmer identity and direct live access.</p>
+                    <!-- Nightcord -->
+                    <a class="proj-card glass" href="/" data-reveal>
+                        <div class="proj-card-top">
+                            <img class="proj-card-avatar" src="/image.png" alt="Nightcord" width="40" height="40">
+                            <div class="proj-card-names">
+                                <span class="proj-card-org">nightcordoff /</span>
+                                <span class="proj-card-name">Nightcord</span>
+                            </div>
                         </div>
-                    </article>
-                    <article class="project-rail-card glass-lite">
-                        <span class="project-rail-index">02</span>
-                        <div>
-                            <strong>Next project</strong>
-                            <p>Reserved slot for the next experimental product presentation.</p>
+                        <p class="proj-card-desc">A Discord client packed with powerful features Discord never gave you. Plugins, themes, tweaks — all built-in.</p>
+                        <div class="proj-card-footer">
+                            <span class="proj-card-stat">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span id="proj-nc-downloads">—</span>
+                            </span>
+                            <span class="proj-card-lang">
+                                <span class="proj-lang-dot" style="background:#3178c6"></span>
+                                TypeScript
+                            </span>
                         </div>
-                    </article>
-                    <article class="project-rail-card glass-lite">
-                        <span class="project-rail-index">03</span>
-                        <div>
-                            <strong>Future drop</strong>
-                            <p>Another concept page can plug into this collection without changing the structure.</p>
+                    </a>
+
+                                        <!-- nightcord_louder -->
+                    <a class="proj-card glass" href="https://github.com/nightcordoff/nightcord_louder/releases/" data-reveal>
+                        <div class="proj-card-top">
+                            <img class="proj-card-avatar" src="/louderlogo.png" alt="Nightcord Louder" width="40" height="40">
+                            <div class="proj-card-names">
+                                <span class="proj-card-org">nightcordoff /</span>
+                                <span class="proj-card-name">Nightcord Louder</span>
+                            </div>
                         </div>
-                    </article>
+                        <p class="proj-card-desc">A cord that offers you an unprecedented audio experience, innovative and premium options.</p>
+                        <div class="proj-card-footer">
+                            <span class="proj-card-stat">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span id="proj-nc-downloads">351</span>
+                            </span>
+                            <span class="proj-card-lang">
+                                <span class="proj-lang-dot" style="background:#490000"></span>
+                                C++
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Soundcord -->
+                    <a class="proj-card glass" href="https://nightcord.online/soundcord" target="_blank" rel="noreferrer" data-reveal style="transition-delay:80ms">
+                        <div class="proj-card-top">
+                            <img class="proj-card-avatar" src="/soundcord-logo.png" alt="Soundcord" width="40" height="40">
+                            <div class="proj-card-names">
+                                <span class="proj-card-org">nightcordoff /</span>
+                                <span class="proj-card-name">Soundcord</span>
+                            </div>
+                        </div>
+                        <p class="proj-card-desc">Stream every track you love — no ads, no limits, no skips. SoundCloud's full catalog directly inside Discord.</p>
+                        <div class="proj-card-footer">
+                            <span class="proj-card-stat">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                113
+                            </span>
+                            <span class="proj-card-lang">
+                                <span class="proj-lang-dot" style="background:#f1e05a"></span>
+                                JavaScript
+                            </span>
+                        </div>
+                    </a>
+
                 </div>
             </section>
         </main>
@@ -105,9 +127,24 @@
     <script type="module" src="/shared.js"></script>
     <script type="module">
         fetch('/api/overview').then(r => r.json()).then(d => {
-            const pill = document.getElementById('project-version-pill');
-            if (pill && d.version) pill.textContent = d.version;
+            const dl = document.getElementById('proj-nc-downloads');
+            if (dl && d.downloads?.stable) dl.textContent = new Intl.NumberFormat('en-US').format(d.downloads.stable);
         }).catch(() => {});
+
+        const input = document.getElementById('proj-search');
+        const cards = document.querySelectorAll('.proj-card');
+        const count = document.getElementById('proj-count');
+        input.addEventListener('input', () => {
+            const q = input.value.trim().toLowerCase();
+            let visible = 0;
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const show = !q || text.includes(q);
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            count.textContent = `${visible} active project${visible !== 1 ? 's' : ''}`;
+        });
     </script>
 </body>
 

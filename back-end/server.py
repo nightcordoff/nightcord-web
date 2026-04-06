@@ -69,6 +69,7 @@ COMMUNITY_TEAM_MEMBERS = [
     {"id": "1467485804833275974", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
     {"id": "853703614656806922", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
     {"id": "1214655422980423731", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
+    {"id": "1480844053754155028", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
     {"id": "156817624892702720", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "119359281173626882", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1483111868980531240", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
@@ -95,6 +96,7 @@ PAGE_ROUTES = {
     "/download": "/download.html",
     "/plugins": "/plugins.html",
     "/community": "/community.html",
+    "/themes": "/themes.html",
     "/project": "/project.html",
     "/admin": "/admin.html",
 }
@@ -152,6 +154,9 @@ GITHUB_RELEASE_CACHE: dict[str, object] = {"tag": None, "fetched_at": None}
 GITHUB_RELEASE_CACHE_SECONDS = 300
 GITHUB_RELEASE_REPO = "nightcordoff/nightcordclient-releases"
 
+EQUICORD_THEMES_CACHE: dict[str, object] = {"data": None, "fetched_at": None}
+EQUICORD_THEMES_CACHE_SECONDS = 600
+
 
 def fetch_github_latest_tag() -> str:
     cached_tag = GITHUB_RELEASE_CACHE.get("tag")
@@ -173,6 +178,22 @@ def fetch_github_latest_tag() -> str:
 
 def now_utc() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def fetch_equicord_themes() -> list:
+    cached = EQUICORD_THEMES_CACHE.get("data")
+    fetched_at = EQUICORD_THEMES_CACHE.get("fetched_at")
+    if cached is not None and fetched_at and now_utc() - fetched_at < timedelta(seconds=EQUICORD_THEMES_CACHE_SECONDS):
+        return cached
+    try:
+        data = fetch_remote_json("https://api.themes.equicord.org/themes")
+        if isinstance(data, list):
+            EQUICORD_THEMES_CACHE["data"] = data
+            EQUICORD_THEMES_CACHE["fetched_at"] = now_utc()
+            return data
+    except Exception as exc:
+        print(f"Could not fetch Equicord themes: {exc}")
+    return cached if cached is not None else []
 
 
 def now_iso() -> str:
@@ -931,6 +952,10 @@ class NightcordHandler(SimpleHTTPRequestHandler):
 
         if parsed.path == "/api/overview":
             self.respond_json(HTTPStatus.OK, build_overview())
+            return
+
+        if parsed.path == "/api/themes":
+            self.respond_json(HTTPStatus.OK, fetch_equicord_themes())
             return
 
         if parsed.path == "/api/community/discord":
