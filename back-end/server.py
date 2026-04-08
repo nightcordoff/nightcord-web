@@ -44,8 +44,8 @@ def load_env_file(env_path: Path) -> None:
 
 load_env_file(PROJECT_DIR / ".env")
 
-HOST = "127.0.0.1"
-PORT = 4173
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 4173))
 SESSION_DURATION_DAYS = 14
 DEFAULT_SUPERADMIN_EMAIL = "root@nightcord.local"
 DEFAULT_SUPERADMIN_PASSWORD = "NightcordRoot!2026"
@@ -67,9 +67,12 @@ COMMUNITY_TEAM_MEMBERS = [
     {"id": "1463560204259164404", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
     {"id": "1039978099548377088", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
     {"id": "1467485804833275974", "role": "Moderator", "section": "Moderation", "blurb": "Server moderation and community safety."},
+    {"id": "1487862786083127429", "role": "Developer", "section": "Team", "blurb": "Development and feature contributions to Nightcord."},
+    {"id": "1477349706450604135", "role": "Developer", "section": "Team", "blurb": "Development and feature contributions to Nightcord."},
     {"id": "853703614656806922", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
     {"id": "1214655422980423731", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
     {"id": "1480844053754155028", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
+    {"id": "910153578377797662", "role": "Helper", "section": "Helper", "blurb": "Community support and user assistance."},
     {"id": "156817624892702720", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "119359281173626882", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1483111868980531240", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
@@ -88,6 +91,12 @@ COMMUNITY_TEAM_MEMBERS = [
     {"id": "1467485804833275974", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1341130103203041302", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     {"id": "1256361101961199666", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1001474370608300203", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "208717356267077633", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1051849204856799382", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1445077438328602634", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1163470989439553537", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
+    {"id": "1473738171811365020", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
     # Contributors only on GitHub (no Discord ID required — set id to None or omit)
     # Example: {"id": None, "github": "octocat", "role": "Contributor", "section": "Contributor", "blurb": "Open-source contributions to Nightcord."},
 ]
@@ -104,8 +113,8 @@ PAGE_ROUTES = {
 
 SEED_METRICS = [
     ("Downloads", "1,075"),
-    ("Built-in plugins", "65"),
-    ("Latest release", "v1.16.6"),
+    ("Built-in plugins", "72"),
+    ("Latest release", "v1.16.8"),
     ("Core", "C rewrite"),
 ]
 
@@ -119,11 +128,14 @@ SEED_FEATURES = [
 ]
 
 SEED_RELEASES = [
-    ("v1.16.6", "Latest Release", "Plugin system with instant enable/disable, new plugin page, 12 built-in plugins, 8 new plugins, DMs typing indicator, real-time guild text fix, sound notification loop fix, 5 custom SVG icons, and multiple UI fixes.", "March 2026", 1),
-    ("v61.8", "Previous Release", "GIF background performance overhaul, stronger notification audio fallback, Amp Panel de-esser and vocal-forward filters, global DM search, and 5 bug fixes across crash, audio, UI, and build.", "March 2026", 2),
-    ("v61.7", "Previous Release", "PitchProof VST2 support, APO EQ integration, Sound Feedback monitor, Ghost/Main audio routing, pinned DMs panel, resizable window, and 8 bug fixes across memory, crash, build, and performance.", "March 2026", 3),
-    ("v61.6", "Previous Release", "Clickable links and Discord invites in messages, sidebar transparency fix, DM auto-sort on open, background cover mode, and compilation fixes.", "February 2026", 4),
-    ("v61.5", "Major Feature Update", "DM pin categories, group DM creation, DM export, server reorder, Spotify playlist integration, background image cover mode, and bitrate/buffer defaults update.", "February 2026", 5),
+    ("v1.16.8", "Latest Release", "Fixed Plugins FakePerm, Ghost Account, VB Virtual Cable, MassDM, Logs, SoundCordPlayer, CursormacOS, Activity Spoofer. Fixed Theme Library, AutoUpdate, Overlay Discord. Reduced lags and improved performance. Added ShowHiddenChannels, DMbomb, Badge NightCord System.", "April 2026", 1),
+    ("v1.16.7", "Previous Release", "Fixed ScreenSharing Loading, Load NightCord/Discord Stable, AutoActive Plugins, Stealth Mode. Added BackPack Plugins.", "April 2026", 2),
+    ("v1.16.6", "Previous Release", "Fixed Plugins VoiceDictation, StreamProof, AddFakeSwitcher, AutoCorrect. Added Abreviation, ActivitySpoofer, LiveWallpaper, ChannelWallpaper, ClonnerServer, SelfDestruct Plugins.", "April 2026", 3),
+    ("v1.16.5", "Previous Release", "Fixed Plugins FakePerm, VideoRecorder, AutoTranslate, Ghost Client. Reduced lags and improved performance. Added StreamProof, Translucence Plugins.", "April 2026", 4),
+    ("v1.16.4", "Previous Release", "Fixed Videos Tutorial, Ghost Client Plugins, CustomProfil Plugins. Added StealthMode Button, DEV Team Page, DoubleCall Plugins, Dark Chat AI Button.", "April 2026", 5),
+    ("v1.16.3", "Major Feature Update", "Fixed Channel invisible, CustomProfil, Stream loading, AutoUpdate. Reduced lags and improved performance. Added EncryptedMessage, MuteAllServer, VB-Audio, AudioLimiter Plugins, Tutorial Videos on Plugins, CursorMac OS.", "March 2026", 6),
+    ("v1.16.2", "Previous Release", "Fixed Plugins FakePerm, display issues with channels. Reduced lags and improved performance. Added PlatformIndicators Plugins, AutoUpdate System.", "March 2026", 7),
+    ("v1.16.1", "Previous Release", "Fixed issues with screen sharing, display issues with channels. Reduced lags and improved performance.", "March 2026", 8),
 ]
 
 SEED_STACK = [
@@ -400,7 +412,7 @@ def build_overview() -> dict[str, object]:
         "hero": {
             "eyebrow": "A Discord client packed with powerful features Discord never gave you.",
             "title": "Nightcord",
-            "subtitle": "Everything Discord refuses to build — already shipped.",
+            "subtitle": "Everything Discord doesn't build, we create.",
         },
         "database": {
             "engine": "SQLite",
@@ -1139,8 +1151,20 @@ class NightcordHandler(SimpleHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        # CORS Headers
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PATCH, PUT, DELETE")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Session-Token, Authorization")
         self.end_headers()
         self.wfile.write(body)
+
+    def do_OPTIONS(self) -> None:
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PATCH, PUT, DELETE")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Session-Token, Authorization")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
 
 
 def main() -> None:

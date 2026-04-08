@@ -56,13 +56,7 @@ function renderOverview(overview) {
     if (liveDatabase) {
         liveDatabase.textContent = '';
     }
-    if (stableDownloads) {
-        stableDownloads.textContent = new Intl.NumberFormat('en-US').format(overview.downloads.stable);
-    }
-    if (pluginCount) {
-        pluginCount.textContent = new Intl.NumberFormat('en-US').format(overview.plugin_count ?? 65);
-    }
-    document.getElementById('footer-runtime').textContent = `${overview.brand} runtime · ${overview.runtime}`;
+    document.getElementById('footer-runtime').textContent = "NightCord Official WebSite";
 
     if (metricGrid) {
         metricGrid.innerHTML = overview.metrics.map((metric) => `
@@ -102,7 +96,7 @@ function renderOverview(overview) {
     }
 
     document.getElementById('release-list').innerHTML = overview.releases.map((release) => `
-        <article class="timeline-item glass-lite">
+        <article class="timeline-item">
             <div>
                 <div class="timeline-date">${release.released_at}</div>
                 <div class="feature-chip">${release.version}</div>
@@ -225,16 +219,100 @@ document.getElementById('feature-grid')?.addEventListener('click', (event) => {
 
 bootContributeModal();
 
+function animateCounter(el, target) {
+    if (!el) return;
+    const current = Number(el.textContent.replace(/,/g, '')) || 0;
+    const duration = 1200;
+    const start = performance.now();
+    
+    el.classList.add('counting');
+    
+    function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+        const val = Math.floor(eased * target);
+        el.textContent = new Intl.NumberFormat('en-US').format(val);
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            el.classList.remove('counting');
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
 async function boot() {
-    try {
-        const health = await readJson('/api/health');
-        setHeaderStatus(`API ${health.status}`);
-        const overview = await readJson('/api/overview');
-        renderOverview(overview);
-    } catch (error) {
-        console.error(error);
-        setHeaderStatus('API unavailable', false);
+    const DB_CONFIG = {
+        url: atob('aHR0cHM6Ly9uaWdodGNvcmQtMTc0ZTktZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29t')
+    };
+
+    // Start backend fetching independently so it doesn't block GitHub/Firebase
+    const loadBackend = async () => {
+        try {
+            const health = await readJson(getApiUrl('/api/health'));
+            setHeaderStatus(`API ${health.status}`);
+            const overview = await readJson(getApiUrl('/api/overview'));
+            renderOverview(overview);
+        } catch (error) {
+            console.error(error);
+            setHeaderStatus('API unavailable', false);
+        }
+    };
+    loadBackend();
+    
+    // Set up direct download button on the homepage
+    const winBtn = document.querySelector('.button-download-windows');
+    const stableDownloads = document.getElementById('stable-downloads');
+
+    if (stableDownloads) {
+        fetch(`${DB_CONFIG.url}/downloads/count.json`)
+            .then(r => r.json())
+            .then(data => {
+                const val = Number(data) || 0;
+                animateCounter(stableDownloads, val);
+                
+                // Also update the 'Downloads' metric in the grid if present
+                const metricCards = document.querySelectorAll('.metric-card');
+                metricCards.forEach(card => {
+                    const label = card.querySelector('span')?.textContent;
+                    if (label === 'Downloads') {
+                        const strong = card.querySelector('strong');
+                        if (strong) strong.textContent = new Intl.NumberFormat('en-US').format(val);
+                    }
+                });
+            }).catch(() => {});
+    }
+
+    if (winBtn) {
+        fetch('https://api.github.com/repos/nightcordoff/nightcordclient-releases/releases/latest')
+            .then(r => r.json())
+            .then(data => {
+                const exe = data?.assets?.find(a => a.name.endsWith('.exe'));
+                if (exe && exe.browser_download_url) {
+                    winBtn.href = exe.browser_download_url;
+                }
+            }).catch(() => {});
+            
+        winBtn.addEventListener('click', () => {
+            // Optimistic UI update
+            if (stableDownloads) {
+                const current = Number(stableDownloads.textContent.replace(/,/g, '')) || 0;
+                stableDownloads.textContent = new Intl.NumberFormat('en-US').format(current + 1);
+                stableDownloads.classList.add('counting');
+                setTimeout(() => stableDownloads.classList.remove('counting'), 600);
+            }
+            
+            fetch(`${DB_CONFIG.url}/downloads.json`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ "count": { ".sv": { "increment": 1 } } }),
+                keepalive: true
+            }).catch(console.error);
+        });
+
     }
 }
 
-boot();
+boot();

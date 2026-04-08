@@ -136,9 +136,9 @@ function renderUsers(users) {
 }
 
 async function loadOverview() {
-    const health = await readJson('/api/health');
+    const health = await readJson(getApiUrl('/api/health'));
     setHeaderStatus(`API ${health.status}`);
-    const overview = await readJson('/api/overview');
+    const overview = await readJson(getApiUrl('/api/overview'));
     elements.footer.textContent = `${overview.brand} runtime · ${overview.runtime}`;
     renderSeededCreds(overview.auth);
 }
@@ -148,7 +148,7 @@ async function loadUsers() {
         elements.userList.innerHTML = '';
         return;
     }
-    const payload = await readJson('/api/admin/users');
+    const payload = await readJson(getApiUrl('/api/admin/users'));
     renderUsers(payload.users);
     setAdminStatus(`Loaded ${payload.users.length} account(s).`);
 }
@@ -159,7 +159,7 @@ async function refreshSession() {
         return;
     }
     try {
-        const payload = await readJson('/api/auth/me');
+        const payload = await readJson(getApiUrl('/api/auth/me'));
         session.user = payload.user;
         renderSession();
         await loadUsers();
@@ -171,7 +171,7 @@ async function refreshSession() {
 elements.loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
-        const payload = await readJson('/api/auth/login', {
+        const payload = await readJson(getApiUrl('/api/auth/login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -189,7 +189,7 @@ elements.loginForm.addEventListener('submit', async (event) => {
 
 elements.logoutButton.addEventListener('click', async () => {
     try {
-        await readJson('/api/auth/logout', { method: 'POST' });
+        await readJson(getApiUrl('/api/auth/logout'), { method: 'POST' });
     } catch {
         // ignore logout errors
     }
@@ -200,7 +200,7 @@ elements.logoutButton.addEventListener('click', async () => {
 elements.passwordForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
-        await readJson('/api/auth/change-password', {
+        await readJson(getApiUrl('/api/auth/change-password'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -219,7 +219,7 @@ elements.passwordForm.addEventListener('submit', async (event) => {
 elements.createUserForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
-        await readJson('/api/admin/users', {
+        await readJson(getApiUrl('/api/admin/users'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -246,7 +246,7 @@ elements.userList.addEventListener('click', async (event) => {
     const userId = card.dataset.userId;
 
     try {
-        await readJson(`/api/admin/users/${userId}`, {
+        await readJson(getApiUrl(`/api/admin/users/${userId}`), {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

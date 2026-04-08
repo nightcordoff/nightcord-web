@@ -1,4 +1,4 @@
-const API = '/api/themes';
+const API = getApiUrl('/api/themes');
 
 let allThemes = [];
 let activeType = 'all';

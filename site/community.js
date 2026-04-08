@@ -188,7 +188,7 @@ function renderTeam(data) {
 
 async function bootCommunityDiscord() {
     try {
-        const payload = await readJson('/api/community/discord');
+        const payload = await readJson(getApiUrl('/api/community/discord'));
         renderDiscord(payload);
     } catch (error) {
         console.error(error);
@@ -200,7 +200,7 @@ async function bootCommunityDiscord() {
 
 async function bootCommunityTeam() {
     try {
-        const payload = await readJson('/api/community/team');
+        const payload = await readJson(getApiUrl('/api/community/team'));
         renderTeam(payload);
     } catch (error) {
         console.error(error);
