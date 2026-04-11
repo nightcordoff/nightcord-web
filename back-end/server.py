@@ -992,6 +992,10 @@ class NightcordHandler(SimpleHTTPRequestHandler):
             self.respond_json(HTTPStatus.OK, {"users": list_admin_users(), "actor": user_payload(user)})
             return
 
+        if parsed.path == "/api/downloads":
+            self.respond_json(HTTPStatus.OK, {"downloads": get_downloads()})
+            return
+
         if parsed.path.startswith("/api/"):
             self.respond_json(HTTPStatus.NOT_FOUND, {"error": "Unknown API route"})
             return

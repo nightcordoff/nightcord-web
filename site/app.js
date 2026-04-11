@@ -244,11 +244,6 @@ function animateCounter(el, target) {
 }
 
 async function boot() {
-    const DB_CONFIG = {
-        url: atob('aHR0cHM6Ly9uaWdodGNvcmQtMTc0ZTktZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29t')
-    };
-
-    // Start backend fetching independently so it doesn't block GitHub/Firebase
     const loadBackend = async () => {
         try {
             const health = await readJson(getApiUrl('/api/health'));
@@ -261,18 +256,17 @@ async function boot() {
         }
     };
     loadBackend();
-    
-    // Set up direct download button on the homepage
+
     const winBtn = document.querySelector('.button-download-windows');
     const stableDownloads = document.getElementById('stable-downloads');
 
     if (stableDownloads) {
-        fetch(`${DB_CONFIG.url}/downloads/count.json`)
+        fetch(getApiUrl('/api/downloads'))
             .then(r => r.json())
             .then(data => {
-                const val = Number(data) || 0;
+                const val = data?.downloads?.stable || 0;
                 animateCounter(stableDownloads, val);
-                
+
                 // Also update the 'Downloads' metric in the grid if present
                 const metricCards = document.querySelectorAll('.metric-card');
                 metricCards.forEach(card => {
@@ -294,7 +288,7 @@ async function boot() {
                     winBtn.href = exe.browser_download_url;
                 }
             }).catch(() => {});
-            
+
         winBtn.addEventListener('click', () => {
             // Optimistic UI update
             if (stableDownloads) {
@@ -303,11 +297,11 @@ async function boot() {
                 stableDownloads.classList.add('counting');
                 setTimeout(() => stableDownloads.classList.remove('counting'), 600);
             }
-            
-            fetch(`${DB_CONFIG.url}/downloads.json`, {
-                method: 'PATCH',
+
+            // Use secure backend API instead of direct Firebase access
+            fetch(getApiUrl('/api/downloads/stable'), {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ "count": { ".sv": { "increment": 1 } } }),
                 keepalive: true
             }).catch(console.error);
         });
@@ -315,4 +309,4 @@ async function boot() {
     }
 }
 
-boot();
+boot();

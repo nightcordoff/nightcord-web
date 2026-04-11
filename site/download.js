@@ -14,11 +14,6 @@ function setHeaderStatus(message, ok = true) {
     element.style.background = ok ? 'rgba(122, 244, 209, 0.08)' : 'rgba(255, 126, 201, 0.1)';
 }
 
-const DB_CONFIG = {
-    // Obfuscated Firebase URL
-    url: atob('aHR0cHM6Ly9uaWdodGNvcmQtMTc0ZTktZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29t')
-};
-
 async function getGithubRelease(repo) {
     try {
         const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
@@ -28,28 +23,26 @@ async function getGithubRelease(repo) {
     }
 }
 
-async function getFirebaseCount(path) {
+async function getDownloadCount() {
     try {
-        const res = await fetch(`${DB_CONFIG.url}/${path}/count.json`);
+        const res = await fetch(getApiUrl('/api/downloads'));
         if (!res.ok) return 0;
         const data = await res.json();
-        return data !== null ? Number(data) : 0;
+        return data?.downloads?.stable || 0;
     } catch { return 0; }
 }
 
-async function incrementFirebaseCount(path) {
+async function incrementDownloadCount() {
     try {
-        await fetch(`${DB_CONFIG.url}/${path}.json`, {
-            method: 'PATCH',
+        await fetch(getApiUrl('/api/downloads/stable'), {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "count": { ".sv": { "increment": 1 } } }),
             keepalive: true
         });
     } catch {}
 }
 
 async function updateOverview() {
-    // 1. Load backend data (don't block the rest)
     const loadBackend = async () => {
         try {
             const health = await readJson(getApiUrl('/api/health'));
@@ -62,10 +55,9 @@ async function updateOverview() {
     };
     loadBackend();
 
-    // 2. Load release and download count (essential for buttons)
     const [release, stableCount] = await Promise.all([
         getGithubRelease('nightcordoff/nightcordclient-releases'),
-        getFirebaseCount('downloads')
+        getDownloadCount()
     ]);
 
     const version = release?.tag_name || 'latest';
@@ -102,11 +94,10 @@ async function updateOverview() {
 document.getElementById('download-grid').addEventListener('click', async (event) => {
     const el = event.target.closest('[data-action]');
     if (!el) return;
-    
-    // Increment the Firebase counter in the background
+
     if (el.dataset.action === 'stable') {
-        incrementFirebaseCount('downloads').then(async () => {
-             const newCount = await getFirebaseCount('downloads');
+        incrementDownloadCount().then(async () => {
+             const newCount = await getDownloadCount();
              const elCount = document.getElementById('stable-count');
              if (elCount) elCount.textContent = 'Downloads: ' + new Intl.NumberFormat('en-US').format(newCount);
         }).catch(console.error);
