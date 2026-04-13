@@ -399,11 +399,6 @@ def get_downloads() -> dict[str, int]:
 
 
 def build_overview() -> dict[str, object]:
-    with connect_db() as connection:
-        admin_count = connection.execute(
-            "SELECT COUNT(*) FROM users WHERE active = 1 AND role IN ('admin', 'superadmin')"
-        ).fetchone()[0]
-
     return {
         "brand": "Nightcord",
         "version": fetch_github_latest_tag(),
@@ -424,13 +419,6 @@ def build_overview() -> dict[str, object]:
         "features": select_all("SELECT category, name, description FROM features ORDER BY sort_order"),
         "releases": select_all("SELECT version, title, summary, released_at FROM releases ORDER BY sort_order"),
         "stack": select_all("SELECT type, name, description FROM stack_items ORDER BY sort_order"),
-        "auth": {
-            "default_superadmin": {
-                "email": DEFAULT_SUPERADMIN_EMAIL,
-                "password": DEFAULT_SUPERADMIN_PASSWORD,
-            },
-            "admin_count": admin_count,
-        },
     }
 
 
@@ -990,10 +978,6 @@ class NightcordHandler(SimpleHTTPRequestHandler):
             if user is None:
                 return
             self.respond_json(HTTPStatus.OK, {"users": list_admin_users(), "actor": user_payload(user)})
-            return
-
-        if parsed.path == "/api/downloads":
-            self.respond_json(HTTPStatus.OK, {"downloads": get_downloads()})
             return
 
         if parsed.path.startswith("/api/"):
