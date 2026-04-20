@@ -113,12 +113,12 @@ PAGE_ROUTES = {
 
 SEED_METRICS = [
     ("Downloads", "1,075"),
-    ("Built-in plugins", "72"),
-    ("Latest release", "v1.16.8"),
+    ("Built-in plugins", "103"),
+    ("Latest release", "v1.17.0"),
     ("Core", "C rewrite"),
 ]
 
-PLUGIN_COUNT = 65
+PLUGIN_COUNT = 103
 
 SEED_FEATURES = [
     ("Voice", "AntiDeco", "Rejoins automatiquement ton salon vocal si quelqu'un te déconnecte de force.", 1),
@@ -128,14 +128,16 @@ SEED_FEATURES = [
 ]
 
 SEED_RELEASES = [
-    ("v1.16.8", "Latest Release", "Fixed Plugins FakePerm, Ghost Account, VB Virtual Cable, MassDM, Logs, SoundCordPlayer, CursormacOS, Activity Spoofer. Fixed Theme Library, AutoUpdate, Overlay Discord. Reduced lags and improved performance. Added ShowHiddenChannels, DMbomb, Badge NightCord System.", "April 2026", 1),
-    ("v1.16.7", "Previous Release", "Fixed ScreenSharing Loading, Load NightCord/Discord Stable, AutoActive Plugins, Stealth Mode. Added BackPack Plugins.", "April 2026", 2),
-    ("v1.16.6", "Previous Release", "Fixed Plugins VoiceDictation, StreamProof, AddFakeSwitcher, AutoCorrect. Added Abreviation, ActivitySpoofer, LiveWallpaper, ChannelWallpaper, ClonnerServer, SelfDestruct Plugins.", "April 2026", 3),
-    ("v1.16.5", "Previous Release", "Fixed Plugins FakePerm, VideoRecorder, AutoTranslate, Ghost Client. Reduced lags and improved performance. Added StreamProof, Translucence Plugins.", "April 2026", 4),
-    ("v1.16.4", "Previous Release", "Fixed Videos Tutorial, Ghost Client Plugins, CustomProfil Plugins. Added StealthMode Button, DEV Team Page, DoubleCall Plugins, Dark Chat AI Button.", "April 2026", 5),
-    ("v1.16.3", "Major Feature Update", "Fixed Channel invisible, CustomProfil, Stream loading, AutoUpdate. Reduced lags and improved performance. Added EncryptedMessage, MuteAllServer, VB-Audio, AudioLimiter Plugins, Tutorial Videos on Plugins, CursorMac OS.", "March 2026", 6),
-    ("v1.16.2", "Previous Release", "Fixed Plugins FakePerm, display issues with channels. Reduced lags and improved performance. Added PlatformIndicators Plugins, AutoUpdate System.", "March 2026", 7),
-    ("v1.16.1", "Previous Release", "Fixed issues with screen sharing, display issues with channels. Reduced lags and improved performance.", "March 2026", 8),
+    ("v1.17.0", "Major Version Update", "Added SharePerms Manager (Advanced remote permission sharing). Added AutoResponder AI. Unified AntiMove and AntiDeco into AntiMoveDeco. Massive plugin library expansion (100+ plugins). Fixed DM encription and UI scaling for high-DPI displays. Optimized plugin loading speed.", "April 2026", 1),
+    ("v1.16.9", "Stability Update", "Fixed random crashes on startup. Improved voice quality in low-bandwidth conditions. Optimized memory usage for long sessions. Fixed UI glitches in Theme Library. Minor bug fixes and performance improvements.", "April 2026", 2),
+    ("v1.16.8", "Latest Release", "Fixed Plugins FakePerm, Ghost Account, VB Virtual Cable, MassDM, Logs, SoundCordPlayer, CursormacOS, Activity Spoofer. Fixed Theme Library, AutoUpdate, Overlay Discord. Reduced lags and improved performance. Added ShowHiddenChannels, DMbomb, Badge NightCord System.", "April 2026", 3),
+    ("v1.16.7", "Previous Release", "Fixed ScreenSharing Loading, Load NightCord/Discord Stable, AutoActive Plugins, Stealth Mode. Added BackPack Plugins.", "April 2026", 4),
+    ("v1.16.6", "Previous Release", "Fixed Plugins VoiceDictation, StreamProof, AddFakeSwitcher, AutoCorrect. Added Abreviation, ActivitySpoofer, LiveWallpaper, ChannelWallpaper, ClonnerServer, SelfDestruct Plugins.", "April 2026", 5),
+    ("v1.16.5", "Previous Release", "Fixed Plugins FakePerm, VideoRecorder, AutoTranslate, Ghost Client. Reduced lags and improved performance. Added StreamProof, Translucence Plugins.", "April 2026", 6),
+    ("v1.16.4", "Previous Release", "Fixed Videos Tutorial, Ghost Client Plugins, CustomProfil Plugins. Added StealthMode Button, DEV Team Page, DoubleCall Plugins, Dark Chat AI Button.", "April 2026", 7),
+    ("v1.16.3", "Major Feature Update", "Fixed Channel invisible, CustomProfil, Stream loading, AutoUpdate. Reduced lags and improved performance. Added EncryptedMessage, MuteAllServer, VB-Audio, AudioLimiter Plugins, Tutorial Videos on Plugins, CursorMac OS.", "March 2026", 8),
+    ("v1.16.2", "Previous Release", "Fixed Plugins FakePerm, display issues with channels. Reduced lags and improved performance. Added PlatformIndicators Plugins, AutoUpdate System.", "March 2026", 9),
+    ("v1.16.1", "Previous Release", "Fixed issues with screen sharing, display issues with channels. Reduced lags and improved performance.", "March 2026", 10),
 ]
 
 SEED_STACK = [

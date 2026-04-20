@@ -295,8 +295,21 @@ async function boot() {
                 }
             }).catch(() => {});
             
-        winBtn.addEventListener('click', () => {
-            // Optimistic UI update
+        winBtn.addEventListener('click', async () => {
+            const now = Date.now();
+            const LIMIT_WINDOW = 30 * 60 * 1000; // 30 minutes
+            const MAX_CLICKS = 10;
+            
+            // Local check first to save API calls
+            let clickHistory = JSON.parse(localStorage.getItem('nc_dl_history') || '[]');
+            clickHistory = clickHistory.filter(t => now - t < LIMIT_WINDOW);
+            
+            if (clickHistory.length >= MAX_CLICKS) {
+                console.warn('[RateLimit] Maximum downloads reached. Link remains active but counter increment skipped.');
+                return;
+            }
+
+            // Update counter UI optimistically
             if (stableDownloads) {
                 const current = Number(stableDownloads.textContent.replace(/,/g, '')) || 0;
                 stableDownloads.textContent = new Intl.NumberFormat('en-US').format(current + 1);
@@ -304,14 +317,33 @@ async function boot() {
                 setTimeout(() => stableDownloads.classList.remove('counting'), 600);
             }
 
+            // Save new click locally
+            clickHistory.push(now);
+            localStorage.setItem('nc_dl_history', JSON.stringify(clickHistory));
+
+            // Increment on Firebase
             fetch(`${DB_CONFIG.url}/downloads/count.json`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ".sv": { "increment": 1 } }),
                 keepalive: true
             }).catch(console.error);
-        });
 
+            // Update RateLimit structure in Firebase
+            try {
+                // We use a dummy fetch to get the IP if needed, or just use a unique client ID
+                let clientId = localStorage.getItem('nc_client_id');
+                if (!clientId) {
+                    clientId = Math.random().toString(36).substring(2, 15);
+                    localStorage.setItem('nc_client_id', clientId);
+                }
+                
+                fetch(`${DB_CONFIG.url}/ratelimit/${clientId}/clicks.json`, {
+                    method: 'POST',
+                    body: JSON.stringify(now)
+                });
+            } catch(e) {}
+        });
     }
 }
 
