@@ -130,7 +130,6 @@ const homepageFeatures = computed(() =>
       <span v-for="i in 12" :key="i" :class="`star star-${i}`" />
     </div>
   </div>
-
   <main class="page page-home" data-reveal>
     <section class="hero hero-home moon-hero">
       <div class="hero-copy hero-copy-centered">

@@ -16,7 +16,7 @@ interface ShootingStar {
 }
 
 const STAR_COUNT     = 160
-const FRAME_INTERVAL = 1000 / 30
+const FRAME_INTERVAL = 1000 / 60
 const COLORS = ['rgba(255,255,255,', 'rgba(180,200,255,', 'rgba(255,220,180,'] as const
 
 export function useStarCanvas(canvasRef: Ref<HTMLCanvasElement | null>) {
@@ -80,8 +80,8 @@ export function useStarCanvas(canvasRef: Ref<HTMLCanvasElement | null>) {
     ctx.clearRect(0, 0, W, H)
 
     // Nebula glow 1 — cached unless position changed > 4px
-    nebula.x += (pointer.x - nebula.x) * 0.025
-    nebula.y += (pointer.y - nebula.y) * 0.025
+    nebula.x += (pointer.x - nebula.x) * 0.05
+    nebula.y += (pointer.y - nebula.y) * 0.05
     const dx = nebula.x - lastNebulaX, dy = nebula.y - lastNebulaY
     if (!cachedGrad1 || dx * dx + dy * dy > 16) {
       cachedGrad1 = ctx.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, W * 0.55)
@@ -104,12 +104,20 @@ export function useStarCanvas(canvasRef: Ref<HTMLCanvasElement | null>) {
 
     // Stars
     for (const s of stars) {
-      const alpha = Math.max(0.04, s.baseAlpha + Math.sin(tick * s.twinkleSpeed + s.twinkleOffset) * 0.22)
+      const alpha = Math.max(0.04, s.baseAlpha + Math.sin(tick * s.twinkleSpeed + s.twinkleOffset) * 0.3)
       ctx.beginPath()
       ctx.fillStyle = `${COLORS[s.colorIdx]}${alpha})`
+      // Glow for brighter stars
+      if (alpha > 0.5 && s.radius > 0.8) {
+        ctx.shadowBlur = s.radius * 6
+        ctx.shadowColor = `${COLORS[s.colorIdx]}0.8)`
+      } else {
+        ctx.shadowBlur = 0
+      }
       ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2)
       ctx.fill()
     }
+    ctx.shadowBlur = 0
 
     // Shooting stars
     if (--nextShooting <= 0) {

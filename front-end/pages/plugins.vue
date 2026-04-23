@@ -109,10 +109,28 @@ const plugins = [
 ]
 
 const VIDEO_BASE = 'https://raw.githubusercontent.com/nightcordoff/nightcord-tutorials/main/videos/'
-const VIDEO_CACHE_KEY = 'nc_video_status_v2'
+const GITHUB_API  = 'https://api.github.com/repos/nightcordoff/nightcord-tutorials/contents/videos'
+const VIDEO_CACHE_KEY = 'nc_video_status_v3'
+
+// Known videos from GitHub API — used as fallback if API is unavailable
+const KNOWN_VIDEOS = new Set([
+  'Abbreviation','AnonymiseFileNames','AntiGroup','AntiMoveDeco','AudioLimiter',
+  'AutoCorrect','AutoReply','AutoResponder','AutoUnmute','BulkFriendRemove',
+  'CallTimer','ChannelWallpaper','CrashHandler','CreateTheme','CursorMacOS',
+  'CustomProfile','DMBomb','DoubleCall','DoubleEmoji','EncryptedMessage',
+  'EventLogs','ExportDM','Fake Voice Option','FakeDM','FakeFriends','FakePerm',
+  'FakeSwitcher','FloodPanel','FollowUser','GhostClient','HideMedia','ImageZoom',
+  'LiveWallpaper','LockGroup','MassDM','MessageCleaner','MessageLoggerEnhanced',
+  'MultiInstance','MuteAllServers','PlatformIndicators','SelfDestruct',
+  'ServerCloner','SharePerms','ShowHiddenChannels','ShowHiddenThings',
+  'SilentDelete','SilentEdit','SoundCordPlayer','StreamProof','TokenImporter',
+  'Translate','ValidUser','VideoRecorder','ViewIcons','VoiceChannelSearch',
+  'VoiceMessages','VolumeBooster',
+])
 
 const query = ref('')
-const videoStatusMap = ref<Record<string, boolean> | null>(null)
+// Initialize immediately from known list — badges visible on first render
+const videoStatusMap = ref<Record<string, boolean>>(buildMapFromSet(KNOWN_VIDEOS))
 const selectedPlugin = ref<typeof plugins[0] | null>(null)
 const modalVideoSrc = ref('')
 const modalVideoError = ref(false)
@@ -126,7 +144,6 @@ const filteredPlugins = computed(() => {
 })
 
 function hasVideo(name: string) {
-  if (!videoStatusMap.value) return null // unknown yet
   return videoStatusMap.value[name] ?? false
 }
 
@@ -146,9 +163,15 @@ function closeModal() {
   modalVideoSrc.value = ''
 }
 
-// FIX: Video checks are done AFTER the page renders, in small batches to prevent freezing
-// Instead of 140+ simultaneous HEAD requests, we process them in batches of 10
-async function checkVideosBatched() {
+// Build video map from a Set of known video names
+function buildMapFromSet(videoNames: Set<string>): Record<string, boolean> {
+  const map: Record<string, boolean> = {}
+  for (const p of plugins) map[p.name] = videoNames.has(p.name)
+  return map
+}
+
+// Load video list: immediately from hardcoded data, then refresh from GitHub API
+async function loadVideoList() {
   if (!import.meta.client) return
 
   // Check session storage cache first
@@ -160,39 +183,24 @@ async function checkVideosBatched() {
     }
   } catch {}
 
-  const BATCH_SIZE = 10
-  const map: Record<string, boolean> = {}
+  // Use hardcoded list immediately so badges appear at once
+  videoStatusMap.value = buildMapFromSet(KNOWN_VIDEOS)
 
-  for (let i = 0; i < plugins.length; i += BATCH_SIZE) {
-    const batch = plugins.slice(i, i + BATCH_SIZE)
-    // Use AbortController with timeout for each request
-    const results = await Promise.allSettled(
-      batch.map(async (plugin) => {
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 4000)
-        try {
-          const res = await fetch(
-            `${VIDEO_BASE}${encodeURIComponent(plugin.name)}.mp4`,
-            { method: 'HEAD', signal: controller.signal }
-          )
-          return { name: plugin.name, hasVideo: res.ok }
-        } catch {
-          return { name: plugin.name, hasVideo: false }
-        } finally {
-          clearTimeout(timeout)
-        }
-      })
+  // Try to refresh from GitHub API in background for up-to-date data
+  try {
+    const res = await fetch(GITHUB_API)
+    if (!res.ok) return
+    const files: { name: string }[] = await res.json()
+    const videoNames = new Set(
+      files.filter(f => f.name.endsWith('.mp4')).map(f => f.name.replace('.mp4', ''))
     )
-    results.forEach(r => {
-      if (r.status === 'fulfilled') map[r.value.name] = r.value.hasVideo
-    })
-    // Update reactively so badges appear progressively
-    videoStatusMap.value = { ...map }
-    // Small yield between batches to not block the main thread
-    await new Promise(resolve => setTimeout(resolve, 50))
+    const map = buildMapFromSet(videoNames)
+    videoStatusMap.value = map
+    try { sessionStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify(map)) } catch {}
+  } catch {
+    // Keep hardcoded data — already set above
+    try { sessionStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify(videoStatusMap.value)) } catch {}
   }
-
-  try { sessionStorage.setItem(VIDEO_CACHE_KEY, JSON.stringify(map)) } catch {}
 }
 
 const { init: initReveal, destroy: destroyReveal } = useScrollReveal()
@@ -200,8 +208,7 @@ const { init: initReveal, destroy: destroyReveal } = useScrollReveal()
 onMounted(async () => {
   await nextTick()
   initReveal()
-  // Start video checks asynchronously AFTER the page has rendered
-  checkVideosBatched()
+  loadVideoList()
 })
 
 onUnmounted(() => destroyReveal())
@@ -244,11 +251,11 @@ function onKeyDown(e: KeyboardEvent) {
           @click="openModal(plugin)"
           @keydown.enter="openModal(plugin)"
         >
-          <!-- Video badge: shown only after check completes -->
+          <!-- Video badge: visible when plugin has a known video -->
           <span
-            v-if="hasVideo(plugin.name) === true"
             class="plugin-video-badge"
-            data-has-video="true"
+            :data-has-video="videoStatusMap[plugin.name] ? 'true' : 'false'"
+            aria-hidden="true"
             title="Vidéo disponible"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -296,15 +303,23 @@ function onKeyDown(e: KeyboardEvent) {
 
         <!-- Video: only loaded on modal open, not before -->
         <div v-if="modalVideoSrc && !modalVideoError" class="plugin-detail-video-wrap">
-          <video
-            class="plugin-detail-video"
-            :src="modalVideoSrc"
-            autoplay
-            loop
-            muted
-            playsinline
-            @error="modalVideoError = true"
-          />
+          <div class="plugin-device-frame">
+            <div class="plugin-device-chrome">
+              <span class="plugin-device-dot plugin-device-dot--red"></span>
+              <span class="plugin-device-dot plugin-device-dot--yellow"></span>
+              <span class="plugin-device-dot plugin-device-dot--green"></span>
+            </div>
+            <div class="plugin-device-screen">
+              <video
+                :src="modalVideoSrc"
+                autoplay
+                loop
+                muted
+                playsinline
+                @error="modalVideoError = true"
+              />
+            </div>
+          </div>
         </div>
         <p v-else-if="hasVideo(selectedPlugin.name) === false" class="plugin-detail-no-video">
           No tutorial video available for this plugin.
